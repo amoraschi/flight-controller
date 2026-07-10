@@ -47,9 +47,6 @@ void vCalibrationStateEntry(SystemContext_t *ctx) {
     GyroDiscardCount = 0;
 
     ResetVelocityZWindow();
-
-    const SensorMode_t mode = SENSOR_MODE_PERFORMANCE;
-    xQueueOverwrite(xSensorModeQueue, &mode);
 }
 
 SystemState_t xCalibrationStateHandler(SystemContext_t *ctx, StateEvent_t *StateEvent, BaseType_t rx_status) {

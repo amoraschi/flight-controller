@@ -86,7 +86,6 @@ void vStateMachineTask(void *pvParameters) {
 
     vOnStateEntry(CurrentSystemState, xSystemContext);
 
-    // ReSharper disable once CppDFAEndlessLoop
     for (;;) {
         // TODO: Revise timeout
         BaseType_t Received = xQueueReceive(xStateEventQueue, &LatestStateEvent, pdMS_TO_TICKS(100));

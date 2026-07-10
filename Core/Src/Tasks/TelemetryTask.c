@@ -28,7 +28,6 @@ void vTelemetryTask(void *pvParameters) {
 
     HAL_UARTEx_ReceiveToIdle_DMA(huart, TELEMETRY_RX_BUFFER, TELEMETRY_RX_BUFFER_SIZE);
 
-    // ReSharper disable once CppDFAEndlessLoop
     for (;;) {
         uint32_t Size = 0;
         // The notification value carries the received byte count for this DMA event.
