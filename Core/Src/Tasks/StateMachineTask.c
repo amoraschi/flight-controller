@@ -1,17 +1,16 @@
 #include "stm32h7xx_hal.h"
-#include "Tasks/vStateMachineTask.h"
-
 #include <stdio.h>
+#include <States/ApogeeStateHandler.h>
+#include <States/BurnStateHandler.h>
+#include <States/CalibrationStateHandler.h>
+#include <States/IdleStateHandler.h>
+#include <States/LandedStateHandler.h>
+#include <States/ParachuteStateHandler.h>
+#include <States/PrelaunchStateHandler.h>
+#include <Tasks/StateMachineTask.h>
 
 #include "Utils/HIL.h"
 #include "queue.h"
-#include "States/xApogeeStateHandler.h"
-#include "States/xBurnStateHandler.h"
-#include "States/xCalibrationStateHandler.h"
-#include "States/xIdleStateHandler.h"
-#include "States/xLandedStateHandler.h"
-#include "States/xParachuteStateHandler.h"
-#include "States/xPrelaunchStateHandler.h"
 
 TaskHandle_t StateMachineTaskHandle;
 
@@ -159,26 +158,5 @@ void vStateMachineTask(void *pvParameters) {
             printf("%02X", pBytes[i]);
         }
         printf("\r\n");
-
-//        printf(
-//            "Current State: %s, State Event: %s, Received: %lu, Altitude: %f, Vel Z: %f, Pressure: %f, AccelX: %f, AccelY: %f, AccelZ: %f, GyroX: %f, GyroY: %f, GyroZ: %f, MagX: %f, MagY: %f, MagZ: %f, Latitude: %ld, Longitude: %ld\r\n",
-//            GetStateName(CurrentSystemState),
-//            GetEventType(LatestStateEvent.Type),
-//            Received,
-//            LatestStateEvent.SensorData.Altitude,
-//            LatestStateEvent.SensorData.VelocityZ,
-//            LatestStateEvent.SensorData.PressurePa,
-//            LatestStateEvent.SensorData.AccelX,
-//            LatestStateEvent.SensorData.AccelY,
-//            LatestStateEvent.SensorData.AccelZ,
-//            LatestStateEvent.SensorData.GyroX,
-//            LatestStateEvent.SensorData.GyroY,
-//            LatestStateEvent.SensorData.GyroZ,
-//            LatestStateEvent.SensorData.MagX,
-//            LatestStateEvent.SensorData.MagY,
-//            LatestStateEvent.SensorData.MagZ,
-//            LatestStateEvent.SensorData.Latitude,
-//            LatestStateEvent.SensorData.Longitude
-//        );
     }
 }

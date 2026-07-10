@@ -85,6 +85,6 @@ def decode_log(bin_path, csv_path):
 
 
 if __name__ == "__main__":
-    bin_path = "LOG_OFF_CANC_ENABLED_STABLE.BIN"
+    bin_path = "LOG_00.BIN"
     csv_path = "decoded_log0.csv"
     decode_log(bin_path, csv_path)

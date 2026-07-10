@@ -17,6 +17,10 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <Tasks/SDLoggingTask.h>
+#include <Tasks/SensorTask.h>
+#include <Tasks/StateMachineTask.h>
+#include <Tasks/TelemetryTask.h>
 #include "main.h"
 #include "FreeRTOS.h"
 #include "cmsis_os2.h"
@@ -26,10 +30,6 @@
 /* USER CODE BEGIN Includes */
 #include "Utils/configuration.h"
 #include "Utils/shared.h"
-#include "Tasks/vSDLoggingTask.h"
-#include "Tasks/vTelemetryTask.h"
-#include "Tasks/vSensorTask.h"
-#include "Tasks/vStateMachineTask.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
