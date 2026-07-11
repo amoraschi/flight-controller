@@ -7,6 +7,7 @@
 #include "queue.h"
 #include "configuration.h"
 #include "stm32h7xx_hal.h"
+#include "timers.h"
 
 #define BIT(n) (1U << (n))
 #define BITS_SET(value, mask) (((value) & (mask)) == (mask))
@@ -22,12 +23,6 @@ typedef enum {
     COMMAND_ABORT = 0x02,
     COMMAND_CALIBRATION = 0x03
 } CommandType_t;
-
-typedef enum {
-    SENSOR_MODE_OFF,
-    SENSOR_MODE_IDLE,
-    SENSOR_MODE_PERFORMANCE
-} SensorMode_t;
 
 typedef enum {
     STATE_IDLE,         // Initialize sensors at low power
@@ -62,15 +57,6 @@ typedef struct {
     volatile bool SensorsIdleFinished;
 } SystemContext_t;
 
-// TODO: Refine
-typedef struct {
-    I2C_HandleTypeDef *BMP280_Handle;
-    I2C_HandleTypeDef *BMP581_Handle;
-    SPI_HandleTypeDef *IIM42653_Handle;
-    I2C_HandleTypeDef *IIS2MDCTR_Handle;
-    TIM_HandleTypeDef *TIM2_Handle;
-} SystemHandle_t;
-
 typedef enum {
     BMP280_MODE_IDLE_FAILED = 1u << 0,
     BMP280_MODE_PERFORMANCE_FAILED = 1u << 1,
@@ -85,43 +71,11 @@ typedef enum {
     // TODO: Refine
 } SystemFaultFlag_t;
 
-typedef struct {
-    uint32_t Flags;
-} SystemFaultFlags_t;
+typedef uint32_t SystemFaultFlags_t;
 
 #pragma pack(push, 1)
 typedef struct {
-    uint32_t timestamp_ms;
-    int16_t ax;
-    int16_t ay;
-    int16_t az;
-    int16_t gx;
-    int16_t gy;
-    int16_t gz;
-    int16_t mx;
-    int16_t my;
-    int16_t mz;
-    float press;
-    float temp;
-    int32_t lat;
-    int32_t lon;
-} SensorPayload_t;
-
-typedef struct {
-    uint16_t header;
-    uint8_t  msg_type;
-    SensorPayload_t payload;
-} SensorPacket_t;
-
-typedef struct {
-    uint16_t header;
-    uint8_t  msg_type;
-    uint8_t  command_type;
-} CommandPacket_t;
-
-typedef struct {
     uint16_t Sync;
-    uint32_t TimestampMS;
     float AccelX;
     float AccelY;
     float AccelZ;
@@ -137,34 +91,36 @@ typedef struct {
     int32_t Longitude;
     float Altitude;
     float VelocityZ;
-} SensorData_t;
+    uint32_t Flags;
+    uint8_t State;
+} FlightData_t;
 #pragma pack(pop)
 
-typedef enum {
-    STATE_EVENT_SENSOR_DATA,
-    STATE_EVENT_COMMAND
-} StateEventType_t;
-
-#pragma pack(push, 1)
-typedef struct {
-    StateEventType_t Type;
-    SensorData_t SensorData;
-    CommandType_t CommandType;
-} StateEvent_t;
-
-typedef struct {
-    StateEvent_t LatestStateEvent;
-    SystemState_t CurrentSystemState;
-} SDLoggingEvent_t;
-#pragma pack(pop)
-
-extern QueueHandle_t xStateEventQueue;
-extern QueueHandle_t xSensorModeQueue;
-extern QueueHandle_t xSDLoggingQueue;
+extern QueueHandle_t SDLoggingQueue;
 
 #if HIL_MODE
-extern QueueHandle_t xHILModeQueue;
+extern QueueHandle_t HILModeQueue;
 #endif
 
-extern SystemFaultFlags_t xSystemFaultFlags;
+extern TimerHandle_t TimerIIM42653;
+extern TimerHandle_t TimerBMP581;
+extern TimerHandle_t TimerIIS2MDCTR;
+
+extern SystemFaultFlags_t SystemFaultFlags;
+
+extern I2C_HandleTypeDef hi2c1;
+extern I2C_HandleTypeDef hi2c2;
+extern SD_HandleTypeDef hsd1;
+extern SPI_HandleTypeDef hspi2;
+extern TIM_HandleTypeDef htim2;
+extern UART_HandleTypeDef huart1;
+extern DMA_HandleTypeDef hdma_usart1_rx;
+
+#define BMP581_HANDLE      (&hi2c2)
+#define IIM42653_HANDLE    (&hspi2)
+#define IIS2MDCTR_HANDLE   (&hi2c1)
+#define SD_HANDLE          (&hsd1)
+#define TIM2_HANDLE        (&htim2)
+#define USART1_HANDLE      (&huart1)
+
 #endif //SHARED_H

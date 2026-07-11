@@ -6,21 +6,15 @@ void PrelaunchStateEntry(SystemContext_t *ctx) {
     ctx->SDLoggingEnabled = true;
 }
 
-SystemState_t PrelaunchStateHandler(SystemContext_t *ctx, StateEvent_t *StateEvent, BaseType_t rx_status) {
-    if (rx_status == pdPASS && StateEvent->Type == STATE_EVENT_SENSOR_DATA) {
-        if (StateEvent->SensorData.VelocityZ > PRELAUNCH_BURN_VEL_Z_THRESHOLD) {
+SystemState_t PrelaunchStateHandler(SystemContext_t *ctx, FlightData_t FlightData, BaseType_t rx_status) {
+    if (rx_status == pdPASS) {
+        if (FlightData.VelocityZ > PRELAUNCH_BURN_VEL_Z_THRESHOLD) {
             return STATE_BURN;
         }
     }
 
-	if (rx_status == pdPASS && StateEvent->Type == STATE_EVENT_COMMAND) {
-		if (StateEvent->CommandType == COMMAND_ABORT) {
-			return STATE_GROUND_ABORT;
-		}
-	}
-
 	// TODO: Refine
-    if (xSystemFaultFlags.Flags != 0) {
+    if (SystemFaultFlags != 0) {
         return STATE_GROUND_ABORT;
     }
 

@@ -5,7 +5,7 @@
 #include "Utils/shared.h"
 
 typedef struct {
-    SensorData_t Records[SD_LOGGING_RECORDS_PER_BUFFER];
+    FlightData_t Records[SD_LOGGING_RECORDS_PER_BUFFER];
     uint16_t Count;
 } SDLoggingBuffer_t;
 

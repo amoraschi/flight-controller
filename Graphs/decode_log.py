@@ -1,18 +1,19 @@
 """
 Decode a framed binary telemetry log into a CSV file.
 
-Each record is 66 bytes (packed, little-endian):
+Each record is 67 bytes (packed, little-endian):
 
     typedef struct {
         uint16_t Sync;           // 0xCAFE
-        uint32_t TimestampMS;
         float    AccelX, AccelY, AccelZ;
         float    GyroX, GyroY, GyroZ;
         float    MagX, MagY, MagZ;
         float    PressurePa, TemperatureC;
         int32_t  Latitude, Longitude;
         float    Altitude, VelocityZ;
-    } SensorData_t;
+        uint32_t Flags;
+        uint8_t  State;
+    } FlightData_t;
 
 Usage:
     python3 decode_log.py [LOG.BIN] [output.csv]
@@ -24,22 +25,23 @@ import sys
 
 # '<' little-endian, packed
 # H        = uint16_t Sync (0xCAFE)
-# I        = uint32_t TimestampMS
 # 9f       = AccelX/Y/Z, GyroX/Y/Z, MagX/Y/Z (all float)
 # 2f       = PressurePa, TemperatureC (float)
 # 2i       = Latitude, Longitude (int32_t)
 # 2f       = Altitude, VelocityZ (float)
-STRUCT_FORMAT = "<HI9f2f2i2f"
+# I        = uint32_t Flags
+# B        = uint8_t State
+STRUCT_FORMAT = "<H9f2f2i2fIB"
 
 FIELDS = [
     "Sync",
-    "TimestampMS",
     "AccelX", "AccelY", "AccelZ",
     "GyroX", "GyroY", "GyroZ",
     "MagX", "MagY", "MagZ",
     "PressurePa", "TemperatureC",
     "Latitude", "Longitude",
     "Altitude", "VelocityZ",
+    "Flags", "State",
 ]
 
 
@@ -64,14 +66,8 @@ def decode_log(bin_path, csv_path):
 
         chunk = data[pos : pos + record_size]
         values = struct.unpack(STRUCT_FORMAT, chunk)
-        records.append(values[1:])
+        records.append(values[1:])  # skip Sync
         pos += record_size
-
-    POLL_INTERVAL_MS = 10
-    all_zero = all(values[0] == 0 for values in records)
-    if all_zero and records:
-        for i, values in enumerate(records):
-            records[i] = (i * POLL_INTERVAL_MS,) + values[1:]
 
     with open(csv_path, "w", newline="") as f:
         writer = csv.writer(f)

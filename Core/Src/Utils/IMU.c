@@ -9,7 +9,7 @@ float CalculateAcceleration(uint8_t MSB, uint8_t LSB, float Factor) {
     return ((int16_t)((MSB << 8) | LSB)) * Factor;
 }
 
-void CalibrateAccelerometer(StateEvent_t *StateEvent, SystemContext_t *SystemContext, float *AccelSumX, float *AccelSumY, float *AccelSumZ, uint16_t *AccelSampleCount, uint16_t *AccelDiscardCount) {
+void CalibrateAccelerometer(FlightData_t FlightData, SystemContext_t *SystemContext, float *AccelSumX, float *AccelSumY, float *AccelSumZ, uint16_t *AccelSampleCount, uint16_t *AccelDiscardCount) {
     if (SystemContext->AccelCalibrationValid) {
         return;
     }
@@ -19,9 +19,9 @@ void CalibrateAccelerometer(StateEvent_t *StateEvent, SystemContext_t *SystemCon
         return;
     }
 
-    (*AccelSumX) += StateEvent->SensorData.AccelX;
-    (*AccelSumY) += StateEvent->SensorData.AccelY;
-    (*AccelSumZ) += StateEvent->SensorData.AccelZ;
+    (*AccelSumX) += FlightData.AccelX;
+    (*AccelSumY) += FlightData.AccelY;
+    (*AccelSumZ) += FlightData.AccelZ;
     (*AccelSampleCount)++;
 
     if ((*AccelSampleCount) >= ACCEL_CALIBRATION_SAMPLES) {
@@ -37,7 +37,7 @@ float CalculateBiasedAcceleration(SystemContext_t *SystemContext, float Value, f
     return SystemContext->AccelCalibrationValid ? Value - Bias : Value;
 }
 
-void CalibrateGyroscope(StateEvent_t *StateEvent, SystemContext_t *SystemContext, float *GyroSumX, float *GyroSumY, float *GyroSumZ, uint16_t *GyroSampleCount, uint16_t *GyroDiscardCount) {
+void CalibrateGyroscope(FlightData_t FlightData, SystemContext_t *SystemContext, float *GyroSumX, float *GyroSumY, float *GyroSumZ, uint16_t *GyroSampleCount, uint16_t *GyroDiscardCount) {
     if (SystemContext->GyroCalibrationValid) {
         return;
     }
@@ -47,9 +47,9 @@ void CalibrateGyroscope(StateEvent_t *StateEvent, SystemContext_t *SystemContext
         return;
     }
 
-    (*GyroSumX) += StateEvent->SensorData.GyroX;
-    (*GyroSumY) += StateEvent->SensorData.GyroY;
-    (*GyroSumZ) += StateEvent->SensorData.GyroZ;
+    (*GyroSumX) += FlightData.GyroX;
+    (*GyroSumY) += FlightData.GyroY;
+    (*GyroSumZ) += FlightData.GyroZ;
     (*GyroSampleCount)++;
 
     if ((*GyroSampleCount) >= GYRO_CALIBRATION_SAMPLES) {

@@ -17,9 +17,6 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include <Tasks/SDLoggingTask.h>
-#include <Tasks/StateMachineTask.h>
-#include <Tasks/TelemetryTask.h>
 #include "main.h"
 #include "FreeRTOS.h"
 #include "cmsis_os2.h"
@@ -29,6 +26,12 @@
 /* USER CODE BEGIN Includes */
 #include "Utils/configuration.h"
 #include "Utils/shared.h"
+#include "Callbacks/Callbacks.h"
+#include <Tasks/SDLoggingTask.h>
+#include <Tasks/StateMachineTask.h>
+#include <Tasks/TelemetryTask.h>
+
+#include <timers.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -68,17 +71,19 @@ const osThreadAttr_t defaultTask_attributes = {
   .priority = (osPriority_t) osPriorityNormal,
 };
 /* USER CODE BEGIN PV */
-QueueHandle_t xStateEventQueue;
-QueueHandle_t xSDLoggingQueue;
+QueueHandle_t SDLoggingQueue;
 
 #if HIL_MODE
-QueueHandle_t xHILModeQueue;
+QueueHandle_t HILModeQueue;
 #endif
 
-SystemFaultFlags_t xSystemFaultFlags;
+TimerHandle_t TimerIIM42653;
+TimerHandle_t TimerBMP581;
+TimerHandle_t TimerIIS2MDCTR;
 
-SystemHandle_t xSystemHandle;
-SystemContext_t xSystemContext;
+SystemFaultFlags_t SystemFaultFlags;
+
+SystemContext_t SystemContext;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -177,22 +182,20 @@ int main(void)
   /* USER CODE BEGIN RTOS_THREADS */
   HAL_TIM_Base_Start(&htim2);
 
-  xStateEventQueue = xQueueCreate(STATE_EVENT_QUEUE_LENGTH, sizeof(StateEvent_t));
-  xSDLoggingQueue = xQueueCreate(STATE_EVENT_QUEUE_LENGTH, sizeof(SDLoggingEvent_t));
+  SDLoggingQueue = xQueueCreate(STATE_EVENT_QUEUE_LENGTH, sizeof(FlightData_t));
 
 #if HIL_MODE
   xHILModeQueue = xQueueCreate(STATE_EVENT_QUEUE_LENGTH, sizeof(SensorPayload_t));
 #endif
 
-  // Initialize handler struct
-  xSystemHandle.BMP581_Handle = &hi2c2;
-  xSystemHandle.IIM42653_Handle = &hspi2;
-  xSystemHandle.IIS2MDCTR_Handle = &hi2c1;
-  xSystemHandle.TIM2_Handle = &htim2;
-
   CreateTelemetryTask(&huart1, tskIDLE_PRIORITY + 2, 256);
-  CreateStateMachineTask(&xSystemContext, tskIDLE_PRIORITY + 3, 256);
-  CreateSDLoggingTask(&xSystemContext, tskIDLE_PRIORITY + 2, 1024);
+  CreateStateMachineTask(&SystemContext, tskIDLE_PRIORITY + 3, 256);
+  CreateSDLoggingTask(&SystemContext, tskIDLE_PRIORITY + 2, 1024);
+
+  // TODO: Revise rate
+  TimerIIM42653 = xTimerCreate("IIM42653", pdMS_TO_TICKS(25), pdTRUE, NULL, IIM42653_Timer_Callback);
+  TimerBMP581 = xTimerCreate("BMP581", pdMS_TO_TICKS(25), pdTRUE, NULL, BMP581_Timer_Callback);
+  TimerIIS2MDCTR = xTimerCreate("IIS2MDCTR", pdMS_TO_TICKS(50), pdTRUE, NULL, IIS2MDCTR_Timer_Callback);
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 

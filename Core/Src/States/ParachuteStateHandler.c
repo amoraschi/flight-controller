@@ -7,9 +7,9 @@ void ParachuteStateEntry(SystemContext_t *ctx) {
     // TODO: Refine
 }
 
-SystemState_t ParachuteStateHandler(SystemContext_t *ctx, StateEvent_t *StateEvent, BaseType_t rx_status) {
-    if (rx_status == pdPASS && StateEvent->Type == STATE_EVENT_SENSOR_DATA) {
-        if ((float)abs((int)StateEvent->SensorData.VelocityZ) < PARACHUTE_LANDED_VEL_Z_THRESHOLD) {
+SystemState_t ParachuteStateHandler(SystemContext_t *ctx, FlightData_t FlightData, BaseType_t rx_status) {
+    if (rx_status == pdPASS) {
+        if ((float)abs((int)FlightData.VelocityZ) < PARACHUTE_LANDED_VEL_Z_THRESHOLD) {
             return STATE_LANDED;
         }
     }

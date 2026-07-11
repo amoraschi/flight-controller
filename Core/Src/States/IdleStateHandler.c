@@ -7,20 +7,14 @@ void IdleStateEntry(SystemContext_t *ctx) {
     ctx->ReferencePressurePaValid = 0;
 }
 
-SystemState_t IdleStateHandler(SystemContext_t *ctx, StateEvent_t *StateEvent, BaseType_t rx_status) {;
-    if (rx_status == pdPASS && StateEvent->Type == STATE_EVENT_COMMAND) {
-        if (StateEvent->CommandType == COMMAND_CALIBRATION) {
-            return STATE_CALIBRATION;
-        }
-    }
-
+SystemState_t IdleStateHandler(SystemContext_t *ctx, FlightData_t FlightData, BaseType_t rx_status) {
     // TODO: URGENT: Test code, remove later
     if (ctx->SensorsIdleFinished) {
     	return STATE_CALIBRATION;
     }
 
     // TODO: Refine
-    if (xSystemFaultFlags.Flags != 0) {
+    if (SystemFaultFlags != 0) {
         return STATE_GROUND_ABORT;
     }
 

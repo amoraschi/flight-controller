@@ -28,11 +28,11 @@ void SDLoggingTask(void *pvParameters) {
 
     // ReSharper disable once CppDFAEndlessLoop
     for (;;) {
-        SDLoggingEvent_t SDLoggingEvent;
+        FlightData_t FlightData;
 
-        if (xQueueReceive(xSDLoggingQueue, &SDLoggingEvent, pdMS_TO_TICKS(100)) == pdPASS) {
+        if (xQueueReceive(SDLoggingQueue, &FlightData, 0) == pdPASS) {
             if (xSystemContext->SDLoggingEnabled) {
-                ActiveBuffer->Records[ActiveBuffer->Count++] = SDLoggingEvent.LatestStateEvent.SensorData;
+                ActiveBuffer->Records[ActiveBuffer->Count++] = FlightData;
 
                 if (ActiveBuffer->Count >= SD_LOGGING_RECORDS_PER_BUFFER) {
                     WriteBuffer = ActiveBuffer;

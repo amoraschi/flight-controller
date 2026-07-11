@@ -24,7 +24,7 @@ static FRESULT NextLogName(char *Out, size_t Size) {
 FRESULT MountAndOpen(void) {
     FRESULT Result = f_mount(&SDFatFS, SDPath, 1);
     if (Result != FR_OK) {
-        xSystemFaultFlags.Flags |= SD_MOUNT_FAILED;
+        SystemFaultFlags |= SD_MOUNT_FAILED;
         return Result;
     }
 
@@ -37,14 +37,14 @@ FRESULT MountAndOpen(void) {
     char LogName[13];
     Result = NextLogName(LogName, sizeof(LogName));
     if (Result != FR_OK) {
-        xSystemFaultFlags.Flags |= SD_OPEN_FAILED;
+        SystemFaultFlags |= SD_OPEN_FAILED;
         f_mount(NULL, SDPath, 1);
         return Result;
     }
 
     Result = f_open(&SDFile, LogName, FA_CREATE_NEW | FA_WRITE);
     if (Result != FR_OK) {
-        xSystemFaultFlags.Flags |= SD_OPEN_FAILED;
+        SystemFaultFlags |= SD_OPEN_FAILED;
         f_mount(NULL, SDPath, 1);
         return Result;
     }
@@ -64,7 +64,7 @@ FRESULT WriteLoggingBuffer(SDLoggingBuffer_t *Buffer) {
     }
 
     UINT BytesWritten = 0;
-    UINT BytesToWrite = Buffer->Count * sizeof(SensorData_t);
+    UINT BytesToWrite = Buffer->Count * sizeof(FlightData_t);
 
     FRESULT Result = f_write(&SDFile, Buffer->Records, BytesToWrite, &BytesWritten);
     if (Result == FR_OK && BytesWritten != BytesToWrite) {

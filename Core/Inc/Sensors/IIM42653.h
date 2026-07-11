@@ -4,7 +4,10 @@
 #include <stdbool.h>
 #include "stm32h7xx_hal.h"
 
-#define IIM42653_SENSOR_DATA_SIZE   12
+#define ACCEL_SCALE (9.81f / 1024.0f)   // FOR 32G. 1024 LSB/g
+#define GYRO_SCALE 	(1.0f / 16.4f)   // FOR 2000DPS. GYRO = RAW * FACTOR
+
+#define IIM42653_SENSOR_DATA_SIZE   13
 
 #define IIM42653_CS_GPIO_PORT   GPIOD
 #define IIM42653_CS_GPIO_PIN    GPIO_PIN_8
@@ -172,6 +175,8 @@ typedef struct {
     float GyroZ;
 } IIM42653_SensorData_t;
 
+void IIM42653_SelectCS(void);
+void IIM42653_DeselectCS(void);
 HAL_StatusTypeDef IIM42653_Reset(SPI_HandleTypeDef *IIM42653_Handle);
 HAL_StatusTypeDef IIM42653_CheckChipID(SPI_HandleTypeDef *IIM42653_Handle);
 HAL_StatusTypeDef IIM42653_ResetInt(SPI_HandleTypeDef *IIM42653_Handle);

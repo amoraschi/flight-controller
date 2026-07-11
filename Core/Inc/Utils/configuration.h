@@ -1,8 +1,6 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
-#include "Sensors/BMP280.h"
-
 #define STATE_EVENT_QUEUE_LENGTH    3
 #define SENSOR_MODE_QUEUE_LENGTH    1
 

@@ -56,7 +56,8 @@ def parse_log(path):
 
     print(f"Found {len(rows)} records")
 
-    time_s = np.array([float(r["TimestampMS"]) / 1000.0 for r in rows])
+    POLL_INTERVAL_MS = 10
+    time_s = np.arange(len(rows)) * (POLL_INTERVAL_MS / 1000.0)
 
     accel_x = np.array([float(r["AccelX"]) for r in rows])
     accel_y = np.array([float(r["AccelY"]) for r in rows])

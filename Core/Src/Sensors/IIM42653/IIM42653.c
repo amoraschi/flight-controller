@@ -3,14 +3,11 @@
 #include "FreeRTOS.h"
 #include "Utils/IMU.h"
 
-const float ACCEL_SCALE = 9.81f / 1024.0f;   // FOR 32G. 1024 LSB/g
-const float GYRO_SCALE = 1.0f / 16.4f;   // FOR 2000DPS. GYRO = RAW * FACTOR
-
-static void IIM42653_SelectCS(void) {
+void IIM42653_SelectCS(void) {
     HAL_GPIO_WritePin(IIM42653_CS_GPIO_PORT, IIM42653_CS_GPIO_PIN, GPIO_PIN_RESET);
 }
 
-static void IIM42653_DeselectCS(void) {
+void IIM42653_DeselectCS(void) {
     HAL_GPIO_WritePin(IIM42653_CS_GPIO_PORT, IIM42653_CS_GPIO_PIN, GPIO_PIN_SET);
 }
 
@@ -300,7 +297,7 @@ HAL_StatusTypeDef IIM42653_GetData(SPI_HandleTypeDef *IIM42653_Handle, IIM42653_
     TXBuffer[0] = IIM42653_REG_ACCEL_DATA_X1_UI | IIM42653_READ_MASK;
 
     IIM42653_SelectCS();
-    Status = HAL_SPI_TransmitReceive(IIM42653_Handle, TXBuffer, RXBuffer, 13, 100);
+    Status = HAL_SPI_TransmitReceive(IIM42653_Handle, TXBuffer, RXBuffer, IIM42653_SENSOR_DATA_SIZE, 100);
     IIM42653_DeselectCS();
 
     SensorData->AccelX = CalculateAcceleration(RXBuffer[1], RXBuffer[2], ACCEL_SCALE);

@@ -49,34 +49,20 @@ void CalibrationStateEntry(SystemContext_t *ctx) {
     ResetVelocityZWindow();
 }
 
-SystemState_t CalibrationStateHandler(SystemContext_t *ctx, StateEvent_t *StateEvent, BaseType_t rx_status) {
-    if (rx_status == pdPASS && StateEvent->Type == STATE_EVENT_SENSOR_DATA) {
-        CalibratePressure(StateEvent, ctx, &PressureSumPa, &PressureSampleCount, &PressureDiscardCount);
+SystemState_t CalibrationStateHandler(SystemContext_t *ctx, FlightData_t FlightData, BaseType_t rx_status) {
+    if (rx_status == pdPASS) {
+        CalibratePressure(FlightData, ctx, &PressureSumPa, &PressureSampleCount, &PressureDiscardCount);
 //        CalibrateAccelerometer(StateEvent, ctx, &AccelSumX, &AccelSumY, &AccelSumZ, &AccelSampleCount, &AccelDiscardCount);
-        CalibrateGyroscope(StateEvent, ctx, &GyroSumX, &GyroSumY, &GyroSumZ, &GyroSampleCount, &GyroDiscardCount);
+        CalibrateGyroscope(FlightData, ctx, &GyroSumX, &GyroSumY, &GyroSumZ, &GyroSampleCount, &GyroDiscardCount);
 
         ctx->AccelCalibrationValid = 1;
         if (ctx->ReferencePressurePaValid && ctx->AccelCalibrationValid && ctx->GyroCalibrationValid) {
-        	// TODO: Dirty race condition fix
-            StateEvent->SensorData.AccelX = CalculateBiasedAcceleration(ctx, StateEvent->SensorData.AccelX, ctx->AccelBiasX);
-            StateEvent->SensorData.AccelY = CalculateBiasedAcceleration(ctx, StateEvent->SensorData.AccelY, ctx->AccelBiasY);
-            StateEvent->SensorData.AccelZ = CalculateBiasedAcceleration(ctx, StateEvent->SensorData.AccelZ, ctx->AccelBiasZ);
-            StateEvent->SensorData.GyroX = CalculateBiasedGyroscope(ctx, StateEvent->SensorData.GyroX, ctx->GyroBiasX);
-            StateEvent->SensorData.GyroY = CalculateBiasedGyroscope(ctx, StateEvent->SensorData.GyroY, ctx->GyroBiasY);
-            StateEvent->SensorData.GyroZ = CalculateBiasedGyroscope(ctx, StateEvent->SensorData.GyroZ, ctx->GyroBiasZ);
-
             return STATE_PRELAUNCH;
         }
     }
 
-    if (rx_status == pdPASS && StateEvent->Type == STATE_EVENT_COMMAND) {
-        if (StateEvent->CommandType == COMMAND_ABORT) {
-            return STATE_GROUND_ABORT;
-        }
-    }
-
     // TODO: Refine
-    if (xSystemFaultFlags.Flags != 0) {
+    if (SystemFaultFlags != 0) {
         return STATE_GROUND_ABORT;
     }
 

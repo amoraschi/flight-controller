@@ -1,0 +1,35 @@
+#include "Utils/shared.h"
+#include "Sensors/Sensors.h"
+#include "Utils/IMU.h"
+#include "Utils/Altitude.h"
+#include "Utils/Velocity.h"
+
+FlightData_t GetFlightData(SystemState_t SystemState, SystemContext_t *SystemContext, IIM42653_SensorData_t IIM42653_FlightData, BMP581_SensorData_t BMP581_FlightData, IIS2MDCTR_SensorData_t IIS2MDCTR_FlightData) {
+	FlightData_t FlightData;
+
+	FlightData.Sync = SD_LOG_SYNC;
+	FlightData.PressurePa = BMP581_FlightData.PressurePa;
+	FlightData.TemperatureC = BMP581_FlightData.TemperatureC;
+	FlightData.MagX = IIS2MDCTR_FlightData.MagX;
+	FlightData.MagY = IIS2MDCTR_FlightData.MagY;
+	FlightData.MagZ = IIS2MDCTR_FlightData.MagZ;
+
+	FlightData.GyroX = CalculateBiasedGyroscope(SystemContext, IIM42653_FlightData.GyroX, SystemContext->GyroBiasX);
+	FlightData.GyroY = CalculateBiasedGyroscope(SystemContext, IIM42653_FlightData.GyroY, SystemContext->GyroBiasY);
+	FlightData.GyroZ = CalculateBiasedGyroscope(SystemContext, IIM42653_FlightData.GyroZ, SystemContext->GyroBiasZ);
+	FlightData.AccelX = CalculateBiasedAcceleration(SystemContext, IIM42653_FlightData.AccelX, SystemContext->AccelBiasX);
+	FlightData.AccelY = CalculateBiasedAcceleration(SystemContext, IIM42653_FlightData.AccelY, SystemContext->AccelBiasY);
+	FlightData.AccelZ = CalculateBiasedAcceleration(SystemContext, IIM42653_FlightData.AccelZ, SystemContext->AccelBiasZ);
+
+	FlightData.Latitude = 0;
+	FlightData.Longitude = 0;
+
+	FlightData.Altitude = CalculateAltitude(FlightData.PressurePa, FlightData.TemperatureC, SystemContext->ReferencePressurePa, SystemContext->ReferencePressurePaValid);
+	FlightData.Altitude = CalculateFilteredAltitude(SystemContext, FlightData.Altitude);
+	FlightData.VelocityZ = CalculateVelocityZ(SystemContext, TIM2_HANDLE, FlightData.Altitude);
+
+	FlightData.Flags = SystemFaultFlags;
+	FlightData.State = SystemState;
+
+	return FlightData;
+}

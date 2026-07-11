@@ -1,8 +1,4 @@
-#include "stm32h7xx_hal.h"
-#include "Utils/HIL.h"
-#include "queue.h"
 #include "Utils/shared.h"
-
 #include <stdint.h>
 #include <string.h>
 #include <Tasks/TelemetryTask.h>
@@ -33,7 +29,7 @@ void TelemetryTask(void *pvParameters) {
         // The notification value carries the received byte count for this DMA event.
         xTaskNotifyWait(0, UINT32_MAX, &Size, portMAX_DELAY);
 
-        ParseIncomingPacket(TELEMETRY_RX_BUFFER, (uint16_t)Size);
+        // ParseIncomingPacket(TELEMETRY_RX_BUFFER, (uint16_t)Size);
 
         HAL_UARTEx_ReceiveToIdle_DMA(huart, TELEMETRY_RX_BUFFER, TELEMETRY_RX_BUFFER_SIZE);
     }

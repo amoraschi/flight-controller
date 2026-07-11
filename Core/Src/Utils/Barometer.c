@@ -25,8 +25,8 @@ volatile float dbg_ref_press;
 volatile float dbg_ref_discard;
 volatile float dbg_curr_press;
 
-void CalibratePressure(StateEvent_t *StateEvent, SystemContext_t *SystemContext, float *PressureSumPa, uint16_t *PressureSampleCount, uint16_t *PressureDiscardCount) {
-    float PressurePa = StateEvent->SensorData.PressurePa;
+void CalibratePressure(FlightData_t FlightData, SystemContext_t *SystemContext, float *PressureSumPa, uint16_t *PressureSampleCount, uint16_t *PressureDiscardCount) {
+    float PressurePa = FlightData.PressurePa;
     dbg_curr_press = PressurePa;
 
     if (PressurePa > 0.0f && !SystemContext->ReferencePressurePaValid) {
