@@ -193,6 +193,19 @@ input[type="file"] { display: none; }
     padding: 0.3rem 0.6rem; border-radius: 4px; font-size: 0.8rem;
     font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
 }
+.chart-tooltip {
+    position: absolute; pointer-events: none;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 4px; padding: 0.35rem 0.5rem;
+    font-size: 0.7rem; font-family: 'SF Mono', 'Cascadia Code', 'Fira Code', monospace;
+    font-variant-numeric: tabular-nums; color: var(--text);
+    white-space: nowrap; z-index: 10; box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    transition: opacity 0.08s;
+}
+.chart-tooltip .tt-sample { color: var(--text-dim); margin-bottom: 0.15rem; }
+.chart-tooltip .tt-row { display: flex; align-items: center; gap: 0.4rem; }
+.chart-tooltip .tt-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
+.chart-container { position: relative; }
 .hidden { display: none; }
 </style>
 </head>
@@ -310,6 +323,8 @@ function decode(buffer) {
 
 function getCol(records, key) { return records.map(r => r[key]); }
 
+const chartMeta = new Map();
+
 function drawChart(canvas, datasets) {
     const dpr = window.devicePixelRatio || 1;
     const rect = canvas.getBoundingClientRect();
@@ -371,6 +386,8 @@ function drawChart(canvas, datasets) {
         }
         ctx.stroke();
     }
+
+    chartMeta.set(canvas, { datasets, pad, plotW, plotH, yMin, yMax, maxLen, w: rect.width, h: rect.height });
 }
 
 function drawMinimap() {
@@ -504,6 +521,73 @@ function renderCharts() {
         const canvas = document.createElement('canvas');
         canvas.dataset.key = def.key;
         container.appendChild(canvas);
+
+        const tooltip = document.createElement('div');
+        tooltip.className = 'chart-tooltip';
+        tooltip.style.opacity = '0';
+        container.appendChild(tooltip);
+
+        canvas.addEventListener('mousemove', (e) => {
+            const meta = chartMeta.get(canvas);
+            if (!meta) return;
+            const rect = canvas.getBoundingClientRect();
+            const mx = e.clientX - rect.left;
+            const my = e.clientY - rect.top;
+            if (mx < meta.pad.left || mx > meta.w - meta.pad.right) { tooltip.style.opacity = '0'; return; }
+            const frac = (mx - meta.pad.left) / meta.plotW;
+            const idx = Math.round(frac * (meta.maxLen - 1));
+            if (idx < 0 || idx >= meta.maxLen) { tooltip.style.opacity = '0'; return; }
+
+            const startIdx = Math.floor(viewStart * allRecords.length);
+            let rows = '<div class="tt-sample">#' + (startIdx + idx) + '</div>';
+            const labels = meta.datasets.length === 3 ? ['X', 'Y', 'Z'] : null;
+            for (let d = 0; d < meta.datasets.length; d++) {
+                const ds = meta.datasets[d];
+                const val = ds.data[idx];
+                if (val === undefined) continue;
+                const label = labels ? labels[d] : '';
+                rows += `<div class="tt-row"><span class="tt-dot" style="background:${ds.color}"></span>${label ? label + ': ' : ''}${formatNum(val)}</div>`;
+            }
+            tooltip.innerHTML = rows;
+            tooltip.style.opacity = '1';
+
+            let tx = mx + 12;
+            let ty = my - 10;
+            const tw = tooltip.offsetWidth;
+            const th = tooltip.offsetHeight;
+            if (tx + tw > rect.width - 4) tx = mx - tw - 12;
+            if (ty + th > rect.height - 4) ty = rect.height - th - 4;
+            if (ty < 0) ty = 4;
+            tooltip.style.left = tx + 'px';
+            tooltip.style.top = ty + 'px';
+
+            const ctx = canvas.getContext('2d');
+            const dpr = window.devicePixelRatio || 1;
+            drawChart(canvas, meta.datasets);
+            ctx.save();
+            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+            const cx = meta.pad.left + (idx / (meta.maxLen - 1)) * meta.plotW;
+            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-dim').trim();
+            ctx.lineWidth = 1;
+            ctx.setLineDash([3, 3]);
+            ctx.beginPath(); ctx.moveTo(cx, meta.pad.top); ctx.lineTo(cx, meta.pad.top + meta.plotH); ctx.stroke();
+            ctx.setLineDash([]);
+            for (const ds of meta.datasets) {
+                const val = ds.data[idx];
+                if (val === undefined) continue;
+                const cy = meta.pad.top + (1 - (val - meta.yMin) / (meta.yMax - meta.yMin)) * meta.plotH;
+                ctx.fillStyle = ds.color;
+                ctx.beginPath(); ctx.arc(cx, cy, 3.5, 0, Math.PI * 2); ctx.fill();
+            }
+            ctx.restore();
+        });
+
+        canvas.addEventListener('mouseleave', () => {
+            tooltip.style.opacity = '0';
+            const meta = chartMeta.get(canvas);
+            if (meta) drawChart(canvas, meta.datasets);
+        });
+
         chartsDiv.appendChild(container);
     }
 
