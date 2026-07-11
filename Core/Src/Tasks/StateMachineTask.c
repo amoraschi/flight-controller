@@ -1,12 +1,6 @@
 #include "stm32h7xx_hal.h"
 #include <stdio.h>
-#include <States/ApogeeStateHandler.h>
-#include <States/BurnStateHandler.h>
-#include <States/CalibrationStateHandler.h>
-#include <States/IdleStateHandler.h>
-#include <States/LandedStateHandler.h>
-#include <States/ParachuteStateHandler.h>
-#include <States/PrelaunchStateHandler.h>
+#include <States/StateHandlers.h>
 #include <Tasks/StateMachineTask.h>
 
 #include "Utils/HIL.h"
@@ -17,46 +11,7 @@ TaskHandle_t StateMachineTaskHandle;
 volatile SystemState_t dbg_current_state = STATE_IDLE;
 volatile uint32_t dbg_system_faults = {0};
 
-void vCreateStateMachineTask(SystemContext_t *xSystemContext, const UBaseType_t Priority, const uint16_t StackSize) {
-    xTaskCreate(
-        vStateMachineTask,
-        "STATE_MACHINE_TASK",
-        StackSize,
-        xSystemContext,
-        Priority,
-        &StateMachineTaskHandle
-    );
-}
-
-void vOnStateEntry(const SystemState_t state, SystemContext_t *ctx) {
-    switch (state) {
-        case STATE_IDLE:
-            vIdleStateEntry(ctx);
-            break;
-        case STATE_CALIBRATION:
-            vCalibrationStateEntry(ctx);
-            break;
-        case STATE_PRELAUNCH:
-            vPrelaunchStateEntry(ctx);
-            break;
-        case STATE_BURN:
-            vBurnStateEntry(ctx);
-            break;
-        case STATE_APOGEE:
-            vApogeeStateEntry(ctx);
-            break;
-        case STATE_PARACHUTE:
-            vParachuteStateEntry(ctx);
-            break;
-        case STATE_LANDED:
-            vLandedStateEntry(ctx);
-            break;
-        default:
-            break;
-    }
-}
-
-SystemState_t xHandleGlobalCommand(SystemState_t CurrenSystemState, StateEvent_t *Event, BaseType_t Received) {
+SystemState_t HandleGlobalCommand(SystemState_t CurrenSystemState, StateEvent_t *Event, BaseType_t Received) {
     if (Received != pdPASS || Event->Type != STATE_EVENT_COMMAND) {
         return CurrenSystemState;
     }
@@ -76,43 +31,80 @@ SystemState_t xHandleGlobalCommand(SystemState_t CurrenSystemState, StateEvent_t
     }
 }
 
-void vStateMachineTask(void *pvParameters) {
+void CreateStateMachineTask(SystemContext_t *xSystemContext, const UBaseType_t Priority, const uint16_t StackSize) {
+    xTaskCreate(
+        StateMachineTask,
+        "STATE_MACHINE_TASK",
+        StackSize,
+        xSystemContext,
+        Priority,
+        &StateMachineTaskHandle
+    );
+}
+
+void OnStateEntry(const SystemState_t State, SystemContext_t *Context) {
+    switch (State) {
+        case STATE_IDLE:
+            IdleStateEntry(Context);
+            break;
+        case STATE_CALIBRATION:
+            CalibrationStateEntry(Context);
+            break;
+        case STATE_PRELAUNCH:
+            PrelaunchStateEntry(Context);
+            break;
+        case STATE_BURN:
+            BurnStateEntry(Context);
+            break;
+        case STATE_APOGEE:
+            ApogeeStateEntry(Context);
+            break;
+        case STATE_PARACHUTE:
+            ParachuteStateEntry(Context);
+            break;
+        case STATE_LANDED:
+            LandedStateEntry(Context);
+            break;
+        default:
+            break;
+    }
+}
+
+void StateMachineTask(void *pvParameters) {
     SystemContext_t *xSystemContext = pvParameters;
 
     // TODO: Refine
     StateEvent_t LatestStateEvent;
     SystemState_t CurrentSystemState = STATE_IDLE;
-    // TODO: Refine
 
-    vOnStateEntry(CurrentSystemState, xSystemContext);
+    OnStateEntry(CurrentSystemState, xSystemContext);
 
     for (;;) {
         // TODO: Revise timeout
-        BaseType_t Received = xQueueReceive(xStateEventQueue, &LatestStateEvent, pdMS_TO_TICKS(100));
-        SystemState_t NextSystemState = xHandleGlobalCommand(CurrentSystemState, &LatestStateEvent, Received);
+        SystemState_t NextSystemState = HandleGlobalCommand(CurrentSystemState, &LatestStateEvent, Received);
 
         if (NextSystemState == CurrentSystemState) {
             switch (CurrentSystemState) {
                 case STATE_IDLE:
-                    NextSystemState = xIdleStateHandler(xSystemContext, &LatestStateEvent, Received);
+                    NextSystemState = IdleStateHandler(xSystemContext, &LatestStateEvent, Received);
                     break;
                 case STATE_CALIBRATION:
-                    NextSystemState = xCalibrationStateHandler(xSystemContext, &LatestStateEvent, Received);
+                    NextSystemState = CalibrationStateHandler(xSystemContext, &LatestStateEvent, Received);
                     break;
                 case STATE_PRELAUNCH:
-                    NextSystemState = xPrelaunchStateHandler(xSystemContext, &LatestStateEvent, Received);
+                    NextSystemState = PrelaunchStateHandler(xSystemContext, &LatestStateEvent, Received);
                     break;
                 case STATE_BURN:
-                    NextSystemState = xBurnStateHandler(xSystemContext, &LatestStateEvent, Received);
+                    NextSystemState = BurnStateHandler(xSystemContext, &LatestStateEvent, Received);
                     break;
                 case STATE_APOGEE:
-                    NextSystemState = xApogeeStateHandler(xSystemContext, &LatestStateEvent, Received);
+                    NextSystemState = ApogeeStateHandler(xSystemContext, &LatestStateEvent, Received);
                     break;
                 case STATE_PARACHUTE:
-                    NextSystemState = xParachuteStateHandler(xSystemContext, &LatestStateEvent, Received);
+                    NextSystemState = ParachuteStateHandler(xSystemContext, &LatestStateEvent, Received);
                     break;
                 case STATE_LANDED:
-                    NextSystemState = xLandedStateHandler(xSystemContext, &LatestStateEvent, Received);
+                    NextSystemState = LandedStateHandler(xSystemContext, &LatestStateEvent, Received);
                     break;
                     // TODO: Refine
                 case STATE_GROUND_ABORT:
@@ -132,7 +124,7 @@ void vStateMachineTask(void *pvParameters) {
         }
 
         if (NextSystemState != CurrentSystemState) {
-            vOnStateEntry(NextSystemState, xSystemContext);
+            OnStateEntry(NextSystemState, xSystemContext);
             CurrentSystemState = NextSystemState;
 
             // TODO: Remove debug code

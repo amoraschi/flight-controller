@@ -1,4 +1,4 @@
-#include <States/CalibrationStateHandler.h>
+#include "States/StateHandlers.h"
 #include "Utils/Barometer.h"
 #include "Utils/IMU.h"
 #include "Utils/Velocity.h"
@@ -15,7 +15,7 @@ static float GyroSumX, GyroSumY, GyroSumZ;
 static uint16_t GyroSampleCount;
 static uint16_t GyroDiscardCount;
 
-void vCalibrationStateEntry(SystemContext_t *ctx) {
+void CalibrationStateEntry(SystemContext_t *ctx) {
     // TODO: Refine
     ctx->ReferencePressurePa = 0.0f;
     ctx->ReferencePressurePaValid = 0;
@@ -49,7 +49,7 @@ void vCalibrationStateEntry(SystemContext_t *ctx) {
     ResetVelocityZWindow();
 }
 
-SystemState_t xCalibrationStateHandler(SystemContext_t *ctx, StateEvent_t *StateEvent, BaseType_t rx_status) {
+SystemState_t CalibrationStateHandler(SystemContext_t *ctx, StateEvent_t *StateEvent, BaseType_t rx_status) {
     if (rx_status == pdPASS && StateEvent->Type == STATE_EVENT_SENSOR_DATA) {
         CalibratePressure(StateEvent, ctx, &PressureSumPa, &PressureSampleCount, &PressureDiscardCount);
 //        CalibrateAccelerometer(StateEvent, ctx, &AccelSumX, &AccelSumY, &AccelSumZ, &AccelSampleCount, &AccelDiscardCount);

@@ -12,9 +12,9 @@ __attribute__((section(".dma_buffer"))) uint8_t TELEMETRY_RX_BUFFER[TELEMETRY_RX
 
 TaskHandle_t TelemetryTaskHandle;
 
-void vCreateTelemetryTask(UART_HandleTypeDef *huart, const UBaseType_t Priority, const uint16_t StackSize) {
+void CreateTelemetryTask(UART_HandleTypeDef *huart, const UBaseType_t Priority, const uint16_t StackSize) {
     xTaskCreate(
-        vTelemetryTask,
+        TelemetryTask,
         "TELEMETRY_TASK",
         StackSize,
         huart,
@@ -23,7 +23,7 @@ void vCreateTelemetryTask(UART_HandleTypeDef *huart, const UBaseType_t Priority,
     );
 }
 
-void vTelemetryTask(void *pvParameters) {
+void TelemetryTask(void *pvParameters) {
     UART_HandleTypeDef *huart = pvParameters;
 
     HAL_UARTEx_ReceiveToIdle_DMA(huart, TELEMETRY_RX_BUFFER, TELEMETRY_RX_BUFFER_SIZE);

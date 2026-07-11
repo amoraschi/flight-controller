@@ -18,7 +18,6 @@
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
 #include <Tasks/SDLoggingTask.h>
-#include <Tasks/SensorTask.h>
 #include <Tasks/StateMachineTask.h>
 #include <Tasks/TelemetryTask.h>
 #include "main.h"
@@ -70,7 +69,6 @@ const osThreadAttr_t defaultTask_attributes = {
 };
 /* USER CODE BEGIN PV */
 QueueHandle_t xStateEventQueue;
-QueueHandle_t xSensorModeQueue;
 QueueHandle_t xSDLoggingQueue;
 
 #if HIL_MODE
@@ -81,7 +79,6 @@ SystemFaultFlags_t xSystemFaultFlags;
 
 SystemHandle_t xSystemHandle;
 SystemContext_t xSystemContext;
-SensorTaskContext_t xSensorTaskContext;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -181,7 +178,6 @@ int main(void)
   HAL_TIM_Base_Start(&htim2);
 
   xStateEventQueue = xQueueCreate(STATE_EVENT_QUEUE_LENGTH, sizeof(StateEvent_t));
-  xSensorModeQueue = xQueueCreate(SENSOR_MODE_QUEUE_LENGTH, sizeof(SensorMode_t));
   xSDLoggingQueue = xQueueCreate(STATE_EVENT_QUEUE_LENGTH, sizeof(SDLoggingEvent_t));
 
 #if HIL_MODE
@@ -189,19 +185,14 @@ int main(void)
 #endif
 
   // Initialize handler struct
-  // xSystemHandle.BMP280_Handle = &hi2c2;
   xSystemHandle.BMP581_Handle = &hi2c2;
   xSystemHandle.IIM42653_Handle = &hspi2;
   xSystemHandle.IIS2MDCTR_Handle = &hi2c1;
   xSystemHandle.TIM2_Handle = &htim2;
 
-  xSensorTaskContext.Handles = &xSystemHandle;
-  xSensorTaskContext.xSystemContext = &xSystemContext;
-
-  vCreateTelemetryTask(&huart1, tskIDLE_PRIORITY + 2, 256);
-  vCreateSensorTask(&xSensorTaskContext, tskIDLE_PRIORITY + 2, 256);
-  vCreateStateMachineTask(&xSystemContext, tskIDLE_PRIORITY + 3, 256);
-  vCreateSDLoggingTask(&xSystemContext, tskIDLE_PRIORITY + 2, 1024);
+  CreateTelemetryTask(&huart1, tskIDLE_PRIORITY + 2, 256);
+  CreateStateMachineTask(&xSystemContext, tskIDLE_PRIORITY + 3, 256);
+  CreateSDLoggingTask(&xSystemContext, tskIDLE_PRIORITY + 2, 1024);
   /* add threads, ... */
   /* USER CODE END RTOS_THREADS */
 

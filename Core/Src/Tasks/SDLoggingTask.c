@@ -10,9 +10,9 @@ static SDLoggingBuffer_t *WriteBuffer = NULL;
 
 volatile uint64_t dbg_write_fault = 0;
 
-void vCreateSDLoggingTask(SystemContext_t *xSystemContext, const UBaseType_t Priority, const uint16_t StackSize) {
+void CreateSDLoggingTask(SystemContext_t *xSystemContext, const UBaseType_t Priority, const uint16_t StackSize) {
     xTaskCreate(
-        vSDLoggingTask,
+        SDLoggingTask,
         "SD_LOGGING_TASK",
         StackSize,
         xSystemContext,
@@ -21,7 +21,7 @@ void vCreateSDLoggingTask(SystemContext_t *xSystemContext, const UBaseType_t Pri
     );
 }
 
-void vSDLoggingTask(void *pvParameters) {
+void SDLoggingTask(void *pvParameters) {
     SystemContext_t *xSystemContext = pvParameters;
 
     MountAndOpen();
