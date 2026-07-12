@@ -194,9 +194,9 @@ int main(void)
   xHILModeQueue = xQueueCreate(STATE_EVENT_QUEUE_LENGTH, sizeof(SensorPayload_t));
 #endif
 
-  CreateTelemetryTask(&huart1, tskIDLE_PRIORITY + 2, 256);
-  CreateStateMachineTask(&SystemContext, tskIDLE_PRIORITY + 3, 256);
-  CreateSDLoggingTask(&SystemContext, tskIDLE_PRIORITY + 1, 1024);
+  CreateTelemetryTask(&huart1, tskIDLE_PRIORITY + 3, 256);
+  CreateStateMachineTask(&SystemContext, tskIDLE_PRIORITY + 5, 256);
+  CreateSDLoggingTask(&SystemContext, tskIDLE_PRIORITY, 1024);
 
   // TODO: Revise rate
   TimerIIM42653 = xTimerCreate("IIM42653", pdMS_TO_TICKS(10), pdTRUE, NULL, IIM42653_Timer_Callback);

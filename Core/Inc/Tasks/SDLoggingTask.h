@@ -10,7 +10,7 @@ extern TaskHandle_t SDLoggingTaskHandle;
 extern TaskHandle_t SDWriterTaskHandle;
 
 void CreateSDLoggingTask(SystemContext_t *SystemContext, UBaseType_t Priority, uint16_t StackSize);
-void SDLoggingTask(void *pvParameters);
+void SDProducerTask(void *pvParameters);
 void SDWriterTask(void *pvParameters);
 
 #endif //VSDLOGGINGTASK_H
