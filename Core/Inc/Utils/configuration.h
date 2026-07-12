@@ -11,9 +11,8 @@
 #define HIL_MODE                    0
 #define EXTERNAL_COMMANDS           1
 #define AUTO_START_CALIBRATION		1
-// TODO: Update
-// #define SCALE_HEIGHT                5000
-// #define PRESSURE_0                  101325.0f
+
+#define BUZZER_SILENT				0
 
 // Altitude configuration
 #define ALTITUDE_IIR_FILTER_ALPHA    0.1f

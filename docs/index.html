@@ -203,6 +203,9 @@ input[type="file"] { display: none; }
     transition: opacity 0.08s;
 }
 .chart-tooltip .tt-sample { color: var(--text-dim); margin-bottom: 0.15rem; }
+.chart-tooltip .tt-drop {
+    color: var(--red); font-weight: 600; margin-bottom: 0.15rem;
+}
 .chart-tooltip .tt-row { display: flex; align-items: center; gap: 0.4rem; }
 .chart-tooltip .tt-dot { width: 6px; height: 6px; border-radius: 50%; flex-shrink: 0; }
 .chart-container { position: relative; }
@@ -326,6 +329,29 @@ function decode(buffer) {
 
 function getCol(records, key) { return records.map(r => r[key]); }
 
+function arrMin(a) { let m = a[0]; for (let i = 1; i < a.length; i++) if (a[i] < m) m = a[i]; return m; }
+function arrMax(a) { let m = a[0]; for (let i = 1; i < a.length; i++) if (a[i] > m) m = a[i]; return m; }
+
+let dropIndices = [];
+let cachedMedianDelta = 0;
+
+function getMedianDelta() { return cachedMedianDelta; }
+
+function detectDrops(records) {
+    dropIndices = [];
+    if (records.length < 3 || records[0].Tick === undefined) return;
+    const deltas = [];
+    for (let i = 1; i < records.length; i++) deltas.push(records[i].Tick - records[i - 1].Tick);
+    const sorted = deltas.slice().sort((a, b) => a - b);
+    const median = sorted[Math.floor(sorted.length / 2)];
+    if (median <= 0) return;
+    cachedMedianDelta = median;
+    const threshold = median * 1.5;
+    for (let i = 0; i < deltas.length; i++) {
+        if (deltas[i] > threshold) dropIndices.push(i + 1);
+    }
+}
+
 const chartMeta = new Map();
 
 function drawChart(canvas, datasets) {
@@ -344,7 +370,7 @@ function drawChart(canvas, datasets) {
     let allVals = [], maxLen = 0;
     for (const ds of datasets) { allVals = allVals.concat(ds.data); maxLen = Math.max(maxLen, ds.data.length); }
 
-    let yMin = Math.min(...allVals), yMax = Math.max(...allVals);
+    let yMin = arrMin(allVals), yMax = arrMax(allVals);
     if (yMin === yMax) { yMin -= 1; yMax += 1; }
     const yPad = (yMax - yMin) * 0.05;
     yMin -= yPad; yMax += yPad;
@@ -399,6 +425,23 @@ function drawChart(canvas, datasets) {
         ctx.stroke();
     }
 
+    if (dropIndices.length > 0) {
+        const startIdx = Math.floor(viewStart * allRecords.length);
+        const endIdx = Math.floor(viewEnd * allRecords.length);
+        ctx.save();
+        ctx.strokeStyle = style.getPropertyValue('--red').trim();
+        ctx.lineWidth = 1;
+        ctx.globalAlpha = 0.6;
+        ctx.setLineDash([4, 3]);
+        for (const di of dropIndices) {
+            const localIdx = di - startIdx;
+            if (localIdx < 0 || localIdx >= maxLen) continue;
+            const x = pad.left + (localIdx / (maxLen - 1)) * plotW;
+            ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + plotH); ctx.stroke();
+        }
+        ctx.restore();
+    }
+
     chartMeta.set(canvas, { datasets, pad, plotW, plotH, yMin, yMax, maxLen, w: rect.width, h: rect.height });
 }
 
@@ -414,7 +457,7 @@ function drawMinimap() {
 
     const accelZ = getCol(allRecords, 'AccelZ');
     if (!accelZ.length) return;
-    let yMin = Math.min(...accelZ), yMax = Math.max(...accelZ);
+    let yMin = arrMin(accelZ), yMax = arrMax(accelZ);
     if (yMin === yMax) { yMin -= 1; yMax += 1; }
 
     const style = getComputedStyle(document.documentElement);
@@ -550,13 +593,27 @@ function renderCharts() {
             const my = e.clientY - rect.top;
             if (mx < meta.pad.left || mx > meta.w - meta.pad.right) { tooltip.style.opacity = '0'; return; }
             const frac = (mx - meta.pad.left) / meta.plotW;
-            const idx = Math.round(frac * (meta.maxLen - 1));
+            let idx = Math.round(frac * (meta.maxLen - 1));
             if (idx < 0 || idx >= meta.maxLen) { tooltip.style.opacity = '0'; return; }
 
             const startIdx = Math.floor(viewStart * allRecords.length);
+            const SNAP_PX = 8;
+            for (const di of dropIndices) {
+                const localIdx = di - startIdx;
+                if (localIdx < 0 || localIdx >= meta.maxLen) continue;
+                const dropX = meta.pad.left + (localIdx / (meta.maxLen - 1)) * meta.plotW;
+                if (Math.abs(mx - dropX) <= SNAP_PX) { idx = localIdx; break; }
+            }
             const rec = allRecords[startIdx + idx];
             const tickStr = rec && rec.Tick !== undefined ? ' · ' + ((rec.Tick - allRecords[0].Tick) / 1000).toFixed(2) + 's' : '';
             let rows = '<div class="tt-sample">#' + (startIdx + idx) + tickStr + '</div>';
+            const absIdx = startIdx + idx;
+            if (dropIndices.includes(absIdx) && rec && allRecords[absIdx - 1]) {
+                const gap = rec.Tick - allRecords[absIdx - 1].Tick;
+                const medianDelta = getMedianDelta();
+                const missed = Math.round(gap / medianDelta) - 1;
+                rows += '<div class="tt-drop">DROPPED ' + missed + ' sample' + (missed !== 1 ? 's' : '') + ' · gap ' + gap + ' ms</div>';
+            }
             const labels = meta.datasets.length === 3 ? ['X', 'Y', 'Z'] : null;
             for (let d = 0; d < meta.datasets.length; d++) {
                 const ds = meta.datasets[d];
@@ -618,13 +675,13 @@ function renderStats(records, skipped) {
     const pressure = getCol(records, 'PressurePa');
     const temp = getCol(records, 'TemperatureC');
     const alt = getCol(records, 'Altitude');
-    const pMin = Math.min(...pressure).toFixed(1);
-    const pMax = Math.max(...pressure).toFixed(1);
+    const pMin = arrMin(pressure).toFixed(1);
+    const pMax = arrMax(pressure).toFixed(1);
     const tAvg = (temp.reduce((a, b) => a + b, 0) / n).toFixed(1);
-    const altRange = (Math.max(...alt) - Math.min(...alt)).toFixed(3);
+    const altRange = (arrMax(alt) - arrMin(alt)).toFixed(3);
     const voltage = getCol(records, 'BatteryVoltage');
-    const vMin = Math.min(...voltage).toFixed(2);
-    const vMax = Math.max(...voltage).toFixed(2);
+    const vMin = arrMin(voltage).toFixed(2);
+    const vMax = arrMax(voltage).toFixed(2);
     const states = records[0] && records[0].State !== undefined
         ? [...new Set(getCol(records, 'State'))].sort((a,b) => a-b).join(', ') : '—';
 
@@ -643,6 +700,7 @@ function renderStats(records, skipped) {
         <div class="stat-card"><div class="label">Avg temp</div><div class="value">${tAvg} °C</div></div>
         <div class="stat-card"><div class="label">Alt range</div><div class="value">${altRange} m</div></div>
         <div class="stat-card"><div class="label">Battery</div><div class="value">${vMin}–${vMax} V</div></div>
+        <div class="stat-card"><div class="label">Dropped samples</div><div class="value">${dropIndices.length}</div></div>
         <div class="stat-card"><div class="label">States</div><div class="value">${states}</div></div>
     `;
 }
@@ -723,6 +781,7 @@ function processFile(file) {
         const { records, skipped } = decode(e.target.result);
         if (!records.length) { alert('No valid records. Check format.'); return; }
         allRecords = records;
+        detectDrops(records);
         viewStart = 0; viewEnd = 1;
         document.getElementById('dropZone').classList.add('hidden');
         renderStats(records, skipped);

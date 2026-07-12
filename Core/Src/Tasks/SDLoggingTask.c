@@ -1,30 +1,42 @@
 #include <Tasks/SDLoggingTask.h>
 #include "Utils/SD.h"
 
-TaskHandle_t SDLoggingTaskHandle;
+TaskHandle_t SDProducerTaskHandle;
+TaskHandle_t SDWriterTaskHandle;
 
 static SDLoggingBuffer_t BufferA;
 static SDLoggingBuffer_t BufferB;
 static SDLoggingBuffer_t *ActiveBuffer = &BufferA;
 static SDLoggingBuffer_t *WriteBuffer = NULL;
 
+static SemaphoreHandle_t WriteSemaphore;
+
 volatile uint64_t dbg_write_fault = 0;
 
 void CreateSDLoggingTask(SystemContext_t *SystemContext, const UBaseType_t Priority, const uint16_t StackSize) {
+    WriteSemaphore = xSemaphoreCreateBinary();
+
     xTaskCreate(
-        SDLoggingTask,
-        "SD_LOGGING_TASK",
+        SDProducerTask,
+        "SD_PRODUCER",
+        StackSize,
+        SystemContext,
+        Priority + 1,
+        &SDProducerTaskHandle
+    );
+
+    xTaskCreate(
+        SDWriterTask,
+        "SD_WRITER",
         StackSize,
         SystemContext,
         Priority,
-        &SDLoggingTaskHandle
+        &SDWriterTaskHandle
     );
 }
 
-void SDLoggingTask(void *pvParameters) {
+void SDProducerTask(void *pvParameters) {
     SystemContext_t *SystemContext = pvParameters;
-
-    MountAndOpen();
 
     for (;;) {
         FlightData_t FlightData;
@@ -32,29 +44,30 @@ void SDLoggingTask(void *pvParameters) {
         BaseType_t SDQueueStatus = xQueueReceive(SDLoggingQueue, &FlightData, portMAX_DELAY);
 
         if (SDQueueStatus == pdPASS && SystemContext->SDLoggingEnabled) {
-			ActiveBuffer->Records[ActiveBuffer->Count++] = FlightData;
+            ActiveBuffer->Records[ActiveBuffer->Count++] = FlightData;
 
-			if (ActiveBuffer->Count >= SD_LOGGING_RECORDS_PER_BUFFER) {
-				WriteBuffer = ActiveBuffer;
-				ActiveBuffer = (ActiveBuffer == &BufferA) ? &BufferB : &BufferA;
-				ActiveBuffer->Count = 0;
+            if (ActiveBuffer->Count >= SD_LOGGING_RECORDS_PER_BUFFER) {
+                WriteBuffer = ActiveBuffer;
+                ActiveBuffer = (ActiveBuffer == &BufferA) ? &BufferB : &BufferA;
+                ActiveBuffer->Count = 0;
 
-				if (WriteLoggingBuffer(WriteBuffer) != FR_OK) {
-					dbg_write_fault++;
-				}
+                xSemaphoreGive(WriteSemaphore);
+            }
+        }
+    }
+}
 
-				WriteBuffer->Count = 0;
-				f_sync(&SDFile);
-			}
+void SDWriterTask(void *pvParameters) {
+    MountAndOpen();
+
+    for (;;) {
+        xSemaphoreTake(WriteSemaphore, portMAX_DELAY);
+
+        if (WriteLoggingBuffer(WriteBuffer) != FR_OK) {
+            dbg_write_fault++;
         }
 
-        // if (!xSystemContext->SDLoggingEnabled && SDLoggingEvent.CurrentSystemState == STATE_LANDED) {
-        //     if (ActiveBuffer->Count > 0) {
-        //         WriteLoggingBuffer(ActiveBuffer);
-        //         ActiveBuffer->Count = 0;
-        //     }
-        //
-        //     f_sync(&SDFile);
-        // }
+        WriteBuffer->Count = 0;
+        f_sync(&SDFile);
     }
 }

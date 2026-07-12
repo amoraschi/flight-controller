@@ -56,8 +56,8 @@ def parse_log(path):
 
     print(f"Found {len(rows)} records")
 
-    POLL_INTERVAL_MS = 10
-    time_s = np.arange(len(rows)) * (POLL_INTERVAL_MS / 1000.0)
+    tick = np.array([int(r["Tick"]) for r in rows])
+    time_s = (tick - tick[0]) / 1000.0
 
     accel_x = np.array([float(r["AccelX"]) for r in rows])
     accel_y = np.array([float(r["AccelY"]) for r in rows])
@@ -75,6 +75,7 @@ def parse_log(path):
     temperature = np.array([float(r["TemperatureC"]) for r in rows])
     altitude = np.array([float(r["Altitude"]) for r in rows])
     velocity_z = np.array([float(r["VelocityZ"]) for r in rows])
+    battery_v = np.array([float(r["BatteryVoltage"]) for r in rows])
 
     # Three-axis plots
     plot_three_axes(
@@ -140,8 +141,16 @@ def parse_log(path):
         velocity_z,
     )
 
+    plot_single(
+        "battery.png",
+        "Battery Voltage",
+        "Voltage (V)",
+        time_s,
+        battery_v,
+    )
+
     # Combined plot
-    fig, axes = plt.subplots(7, 1, figsize=(14, 21), sharex=True)
+    fig, axes = plt.subplots(8, 1, figsize=(14, 24), sharex=True)
 
     combined = [
         ("Accelerometer", "Acceleration (m/s²)", accel_x, accel_y, accel_z),
@@ -151,6 +160,7 @@ def parse_log(path):
         ("Temperature", "Temperature (°C)", temperature, None, None),
         ("Altitude", "Altitude (m)", altitude, None, None),
         ("Velocity Z", "Velocity (m/s)", velocity_z, None, None),
+        ("Battery Voltage", "Voltage (V)", battery_v, None, None),
     ]
 
     colors = ["#e74c3c", "#2ecc71", "#3498db"]

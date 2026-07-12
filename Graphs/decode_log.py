@@ -1,10 +1,11 @@
 """
 Decode a framed binary telemetry log into a CSV file.
 
-Each record is 67 bytes (packed, little-endian):
+Each record is 76 bytes (packed, little-endian):
 
     typedef struct {
         uint16_t Sync;           // 0xCAFE
+        uint32_t Tick;
         float    AccelX, AccelY, AccelZ;
         float    GyroX, GyroY, GyroZ;
         float    MagX, MagY, MagZ;
@@ -12,7 +13,9 @@ Each record is 67 bytes (packed, little-endian):
         int32_t  Latitude, Longitude;
         float    Altitude, VelocityZ;
         uint32_t Flags;
+        float    BatteryVoltage;
         uint8_t  State;
+        uint8_t  SyncEnd;
     } FlightData_t;
 
 Usage:
@@ -25,23 +28,30 @@ import sys
 
 # '<' little-endian, packed
 # H        = uint16_t Sync (0xCAFE)
+# I        = uint32_t Tick
 # 9f       = AccelX/Y/Z, GyroX/Y/Z, MagX/Y/Z (all float)
 # 2f       = PressurePa, TemperatureC (float)
 # 2i       = Latitude, Longitude (int32_t)
 # 2f       = Altitude, VelocityZ (float)
 # I        = uint32_t Flags
+# f        = float BatteryVoltage
 # B        = uint8_t State
-STRUCT_FORMAT = "<H9f2f2i2fIB"
+# B        = uint8_t SyncEnd
+STRUCT_FORMAT = "<HI9f2f2i2fIfBB"
 
 FIELDS = [
     "Sync",
+    "Tick",
     "AccelX", "AccelY", "AccelZ",
     "GyroX", "GyroY", "GyroZ",
     "MagX", "MagY", "MagZ",
     "PressurePa", "TemperatureC",
     "Latitude", "Longitude",
     "Altitude", "VelocityZ",
-    "Flags", "State",
+    "Flags",
+    "BatteryVoltage",
+    "State",
+    "SyncEnd",
 ]
 
 
