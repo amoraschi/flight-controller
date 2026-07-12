@@ -3,6 +3,7 @@
 #include <States/StateHandlers.h>
 #include <Tasks/StateMachineTask.h>
 #include <Utils/FlightData.h>
+#include <Utils/Battery.h>
 #include "Managers/Managers.h"
 #include "queue.h"
 
@@ -33,6 +34,7 @@ void StateMachineTask(void *pvParameters) {
     OnStateEntry(CurrentSystemState, SystemContext);
 	HandleSensors(SystemContext, CurrentSystemState);
 
+//    BatteryInit();
     SerialInit();
     Buzzer_Beep(100);
 

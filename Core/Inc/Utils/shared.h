@@ -107,6 +107,7 @@ extern QueueHandle_t HILModeQueue;
 extern TimerHandle_t TimerIIM42653;
 extern TimerHandle_t TimerBMP581;
 extern TimerHandle_t TimerIIS2MDCTR;
+extern TimerHandle_t TimerBattery;
 
 extern SystemFaultFlags_t SystemFaultFlags;
 
@@ -116,6 +117,7 @@ extern SD_HandleTypeDef hsd1;
 extern SPI_HandleTypeDef hspi2;
 extern TIM_HandleTypeDef htim2;
 extern UART_HandleTypeDef huart1;
+//extern ADC_HandleTypeDef hadc1;
 
 #define BMP581_HANDLE      (&hi2c2)
 #define IIM42653_HANDLE    (&hspi2)
@@ -123,5 +125,6 @@ extern UART_HandleTypeDef huart1;
 #define SD_HANDLE          (&hsd1)
 #define TIM2_HANDLE        (&htim2)
 #define USART1_HANDLE      (&huart1)
+//#define ADC1_HANDLE        (&hadc1)
 
 #endif //SHARED_H
