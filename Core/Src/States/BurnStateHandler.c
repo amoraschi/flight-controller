@@ -5,13 +5,11 @@ void BurnStateEntry(SystemContext_t *ctx) {
     // TODO: Refine
 }
 
-SystemState_t BurnStateHandler(SystemContext_t *ctx, FlightData_t FlightData, BaseType_t rx_status) {
-    if (rx_status == pdPASS) {
-        // TODO: Revise, hysteresis, use acceleration if possible
-        if (FlightData.VelocityZ < BURN_APOGEE_VEL_Z_THRESHOLD) {
-            return STATE_APOGEE;
-        }
-    }
+SystemState_t BurnStateHandler(SystemContext_t *Context, FlightData_t FlightData) {
+	// TODO: Revise, hysteresis, use acceleration if possible
+	if (FlightData.VelocityZ < BURN_APOGEE_VEL_Z_THRESHOLD) {
+		return STATE_APOGEE;
+	}
 
     return STATE_BURN;
 }

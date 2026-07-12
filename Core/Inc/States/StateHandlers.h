@@ -11,12 +11,12 @@ void ApogeeStateEntry(SystemContext_t *Context);
 void ParachuteStateEntry(SystemContext_t *Context);
 void LandedStateEntry(SystemContext_t *Context);
 
-SystemState_t IdleStateHandler(SystemContext_t *Context, FlightData_t FlightData, BaseType_t RxStatus);
-SystemState_t CalibrationStateHandler(SystemContext_t *Context, FlightData_t FlightData, BaseType_t RxStatus);
-SystemState_t PrelaunchStateHandler(SystemContext_t *Context, FlightData_t FlightData, BaseType_t RxStatus);
-SystemState_t BurnStateHandler(SystemContext_t *Context, FlightData_t FlightData, BaseType_t RxStatus);
-SystemState_t ApogeeStateHandler(SystemContext_t *Context, FlightData_t FlightData, BaseType_t RxStatus);
-SystemState_t ParachuteStateHandler(SystemContext_t *Context, FlightData_t FlightData, BaseType_t RxStatus);
-SystemState_t LandedStateHandler(SystemContext_t *Context, FlightData_t FlightData, BaseType_t RxStatus);
+SystemState_t IdleStateHandler(SystemContext_t *Context, FlightData_t FlightData);
+SystemState_t CalibrationStateHandler(SystemContext_t *Context, FlightData_t FlightData);
+SystemState_t PrelaunchStateHandler(SystemContext_t *Context, FlightData_t FlightData);
+SystemState_t BurnStateHandler(SystemContext_t *Context, FlightData_t FlightData);
+SystemState_t ApogeeStateHandler(SystemContext_t *Context, FlightData_t FlightData);
+SystemState_t ParachuteStateHandler(SystemContext_t *Context, FlightData_t FlightData);
+SystemState_t LandedStateHandler(SystemContext_t *Context, FlightData_t FlightData);
 
 #endif // STATEHANDLERS_H

@@ -29,7 +29,7 @@ void SDLoggingTask(void *pvParameters) {
     for (;;) {
         FlightData_t FlightData;
 
-        HAL_StatusTypeDef SDQueueStatus = xQueueReceive(SDLoggingQueue, &FlightData, 0);
+        BaseType_t SDQueueStatus = xQueueReceive(SDLoggingQueue, &FlightData, portMAX_DELAY);
 
         if (SDQueueStatus == pdPASS && SystemContext->SDLoggingEnabled) {
 			ActiveBuffer->Records[ActiveBuffer->Count++] = FlightData;

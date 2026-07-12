@@ -7,9 +7,9 @@ void IdleStateEntry(SystemContext_t *ctx) {
     ctx->ReferencePressurePaValid = 0;
 }
 
-SystemState_t IdleStateHandler(SystemContext_t *ctx, FlightData_t FlightData, BaseType_t rx_status) {
+SystemState_t IdleStateHandler(SystemContext_t *Context, FlightData_t FlightData) {
     // TODO: URGENT: Test code, remove later
-    if (ctx->SensorsIdleFinished) {
+    if (Context->SensorsIdleFinished) {
     	return STATE_CALIBRATION;
     }
 

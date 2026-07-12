@@ -25,20 +25,15 @@
 #define PARACHUTE_LANDED_VEL_Z_THRESHOLD    5.0f
 
 // Barometer Configuration
-#define PRESSURE_CALIBRATION_DISCARD_SAMPLES    200
-#define PRESSURE_CALIBRATION_SAMPLES            500
-
-// Accelerometer Configuration
-#define ACCEL_CALIBRATION_DISCARD_SAMPLES       200
-#define ACCEL_CALIBRATION_SAMPLES               500
+#define PRESSURE_CALIBRATION_DISCARD_SAMPLES    3000
+#define PRESSURE_CALIBRATION_SAMPLES            1000
 
 // Gyroscope Configuration
-#define GYRO_CALIBRATION_DISCARD_SAMPLES        200
-#define GYRO_CALIBRATION_SAMPLES                500
+#define GYRO_CALIBRATION_DISCARD_SAMPLES        3000
+#define GYRO_CALIBRATION_SAMPLES                1000
 
 // SD Configuration
-#define SD_LOGGING_RECORDS_PER_BUFFER       500
-#define SD_SYNC_INTERVAL_TICKS 				pdMS_TO_TICKS(1000)
+#define SD_LOGGING_RECORDS_PER_BUFFER       1000
 #define SD_LOG_SYNC                         0xCAFE
 #define SD_LOG_SYNC_END                     0xBE
 

@@ -5,6 +5,6 @@ void LandedStateEntry(SystemContext_t *ctx) {
     // TODO: Refine
 }
 
-SystemState_t LandedStateHandler(SystemContext_t *ctx, FlightData_t FlightData, BaseType_t rx_status) {
+SystemState_t LandedStateHandler(SystemContext_t *Context, FlightData_t FlightData) {
     return STATE_LANDED;
 }

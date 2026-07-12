@@ -56,7 +56,9 @@ void HandleSensors(SystemContext_t *SystemContext, SystemState_t CurrentSystemSt
 				SystemFaultFlags |= IIS2MDCTR_MODE_IDLE_FAILED;
 			}
 
+#if AUTO_START_CALIBRATION
 			SystemContext->SensorsIdleFinished = true;
+#endif
 			break;
 		case STATE_CALIBRATION:
 			if (BMP581_Mode_Performance(BMP581_HANDLE) != HAL_OK) {
@@ -96,28 +98,28 @@ SystemState_t HandleCommand(SystemState_t CurrentSystemState, CommandType_t Comm
     }
 }
 
-SystemState_t HandleState(SystemState_t CurrentSystemState, SystemContext_t *SystemContext, FlightData_t SensorData, BaseType_t Received) {
+SystemState_t HandleState(SystemState_t CurrentSystemState, SystemContext_t *SystemContext, FlightData_t SensorData) {
 	switch (CurrentSystemState) {
 		case STATE_IDLE:
-			return IdleStateHandler(SystemContext, SensorData, Received);
+			return IdleStateHandler(SystemContext, SensorData);
 			break;
 		case STATE_CALIBRATION:
-			return CalibrationStateHandler(SystemContext, SensorData, Received);
+			return CalibrationStateHandler(SystemContext, SensorData);
 			break;
 		case STATE_PRELAUNCH:
-			return PrelaunchStateHandler(SystemContext, SensorData, Received);
+			return PrelaunchStateHandler(SystemContext, SensorData);
 			break;
 		case STATE_BURN:
-			return BurnStateHandler(SystemContext, SensorData, Received);
+			return BurnStateHandler(SystemContext, SensorData);
 			break;
 		case STATE_APOGEE:
-			return ApogeeStateHandler(SystemContext, SensorData, Received);
+			return ApogeeStateHandler(SystemContext, SensorData);
 			break;
 		case STATE_PARACHUTE:
-			return ParachuteStateHandler(SystemContext, SensorData, Received);
+			return ParachuteStateHandler(SystemContext, SensorData);
 			break;
 		case STATE_LANDED:
-			return LandedStateHandler(SystemContext, SensorData, Received);
+			return LandedStateHandler(SystemContext, SensorData);
 			break;
 			// TODO: Refine
 		case STATE_GROUND_ABORT:

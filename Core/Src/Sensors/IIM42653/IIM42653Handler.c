@@ -82,7 +82,8 @@ HAL_StatusTypeDef IIM42653_Mode_Performance(SPI_HandleTypeDef *IIM42653_Handle) 
         return HAL_ERROR;
     }
 
-    vTaskDelay(pdMS_TO_TICKS(100));
+    // TODO: IIM42653 Might need this much delay
+    vTaskDelay(pdMS_TO_TICKS(2000));
 
     return HAL_OK;
 }

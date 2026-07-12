@@ -44,10 +44,6 @@ typedef enum {
 typedef struct {
     float ReferencePressurePa;
     bool ReferencePressurePaValid;
-    float AccelBiasX;
-    float AccelBiasY;
-    float AccelBiasZ;
-    bool AccelCalibrationValid;
     float GyroBiasX;
     float GyroBiasY;
     float GyroBiasZ;
@@ -76,6 +72,7 @@ typedef uint32_t SystemFaultFlags_t;
 #pragma pack(push, 1)
 typedef struct {
     uint16_t Sync;
+    uint32_t Tick;
     float AccelX;
     float AccelY;
     float AccelZ;

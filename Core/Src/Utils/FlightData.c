@@ -9,6 +9,7 @@ FlightData_t GetFlightData(SystemState_t SystemState, SystemContext_t *SystemCon
 	FlightData_t FlightData;
 
 	FlightData.Sync = SD_LOG_SYNC;
+	FlightData.Tick = xTaskGetTickCount();
 
 	FlightData.PressurePa = BMP581_FlightData.PressurePa;
 	FlightData.TemperatureC = BMP581_FlightData.TemperatureC;

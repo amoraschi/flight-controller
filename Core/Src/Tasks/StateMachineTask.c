@@ -36,11 +36,10 @@ void StateMachineTask(void *pvParameters) {
 
 //    BatteryInit();
     SerialInit();
-    Buzzer_Beep(100);
+    Buzzer_Beep_Counter(100, 2, 500, false);
 
     for (;;) {
         // TODO: Revise timeout
-    	BaseType_t Received = pdPASS;
         BMP581_SensorData_t BMP581_SensorData;
         IIM42653_SensorData_t IIM42653_SensorData;
         IIS2MDCTR_SensorData_t IIS2MDCTR_SensorData;
@@ -56,7 +55,7 @@ void StateMachineTask(void *pvParameters) {
         SystemState_t NextSystemState = CurrentSystemState;
 
         if (NextSystemState == CurrentSystemState) {
-            NextSystemState = HandleState(CurrentSystemState, SystemContext, FlightData, Received);
+            NextSystemState = HandleState(CurrentSystemState, SystemContext, FlightData);
         }
 
         bool StateChanged = NextSystemState != CurrentSystemState;

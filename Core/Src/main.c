@@ -30,6 +30,7 @@
 #include <Tasks/SDLoggingTask.h>
 #include <Tasks/StateMachineTask.h>
 #include <Tasks/TelemetryTask.h>
+#include "Sensors/Sensors.h"
 
 #include <timers.h>
 #include "Utils/Battery.h"
@@ -715,6 +716,7 @@ void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim)
 void Error_Handler(void)
 {
   /* USER CODE BEGIN Error_Handler_Debug */
+  Buzzer_Beep_Counter(100, 5, 200, true);
   /* User can add his own implementation to report the HAL error return state */
   __disable_irq();
   while (1)

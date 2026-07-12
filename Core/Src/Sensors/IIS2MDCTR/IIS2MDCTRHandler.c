@@ -69,9 +69,9 @@ HAL_StatusTypeDef IIS2MDCTR_Mode_Performance(I2C_HandleTypeDef *IIS2MDCTR_Handle
     }
 
     // TODO: Review this
-    if (IIS2MDCTR_EnableOffsetCancellation(IIS2MDCTR_Handle) != HAL_OK) {
-        return HAL_ERROR;
-    }
+//    if (IIS2MDCTR_EnableOffsetCancellation(IIS2MDCTR_Handle) != HAL_OK) {
+//        return HAL_ERROR;
+//    }
 
     if (IIS2MDCTR_EnablePulseFrequency(IIS2MDCTR_Handle) != HAL_OK) {
         return HAL_ERROR;

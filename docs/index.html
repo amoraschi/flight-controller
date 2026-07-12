@@ -254,6 +254,7 @@ const FORMATS = {
             let o = offset;
             const r = {};
             r.Sync = dv.getUint16(o, true); o += 2;
+            r.Tick = dv.getUint32(o, true); o += 4;
             r.AccelX = dv.getFloat32(o, true); o += 4;
             r.AccelY = dv.getFloat32(o, true); o += 4;
             r.AccelZ = dv.getFloat32(o, true); o += 4;
@@ -275,7 +276,7 @@ const FORMATS = {
             r.SyncEnd = dv.getUint8(o); o += 1;
             return { record: r, size: o - offset };
         },
-        recordSize: 72
+        recordSize: 76
     },
     v1: {
         parse(dv, offset) {
@@ -368,12 +369,21 @@ function drawChart(canvas, datasets) {
 
     const startIdx = Math.floor(viewStart * allRecords.length);
     const endIdx = Math.floor(viewEnd * allRecords.length);
+    const visRecs = allRecords.slice(startIdx, Math.max(endIdx, startIdx + 2));
+    const hasTick = visRecs.length > 1 && visRecs[0].Tick !== undefined;
     ctx.textAlign = 'center'; ctx.textBaseline = 'top';
     for (let i = 0; i <= 6; i++) {
         const x = pad.left + (plotW / 6) * i;
-        const sample = startIdx + Math.round(((endIdx - startIdx) / 6) * i);
+        const sampleIdx = Math.round(((visRecs.length - 1) / 6) * i);
+        let label;
+        if (hasTick) {
+            const ms = visRecs[sampleIdx].Tick - allRecords[0].Tick;
+            label = (ms / 1000).toFixed(1) + 's';
+        } else {
+            label = (startIdx + sampleIdx).toString();
+        }
         ctx.fillStyle = textDim;
-        ctx.fillText(sample.toString(), x, h - pad.bottom + 6);
+        ctx.fillText(label, x, h - pad.bottom + 6);
     }
 
     for (const ds of datasets) {
@@ -544,7 +554,9 @@ function renderCharts() {
             if (idx < 0 || idx >= meta.maxLen) { tooltip.style.opacity = '0'; return; }
 
             const startIdx = Math.floor(viewStart * allRecords.length);
-            let rows = '<div class="tt-sample">#' + (startIdx + idx) + '</div>';
+            const rec = allRecords[startIdx + idx];
+            const tickStr = rec && rec.Tick !== undefined ? ' · ' + ((rec.Tick - allRecords[0].Tick) / 1000).toFixed(2) + 's' : '';
+            let rows = '<div class="tt-sample">#' + (startIdx + idx) + tickStr + '</div>';
             const labels = meta.datasets.length === 3 ? ['X', 'Y', 'Z'] : null;
             for (let d = 0; d < meta.datasets.length; d++) {
                 const ds = meta.datasets[d];
@@ -616,8 +628,16 @@ function renderStats(records, skipped) {
     const states = records[0] && records[0].State !== undefined
         ? [...new Set(getCol(records, 'State'))].sort((a,b) => a-b).join(', ') : '—';
 
+    const ticks = getCol(records, 'Tick');
+    const hasTick = ticks.length > 1 && ticks[0] !== undefined;
+    const durationMs = hasTick ? ticks[ticks.length - 1] - ticks[0] : 0;
+    const durationStr = hasTick ? (durationMs / 1000).toFixed(1) + ' s' : '—';
+    const rateStr = hasTick && durationMs > 0 ? (((n - 1) / durationMs) * 1000).toFixed(0) + ' Hz' : '—';
+
     statsDiv.innerHTML = `
         <div class="stat-card"><div class="label">Records</div><div class="value">${n}</div></div>
+        <div class="stat-card"><div class="label">Duration</div><div class="value">${durationStr}</div></div>
+        <div class="stat-card"><div class="label">Sample rate</div><div class="value">${rateStr}</div></div>
         <div class="stat-card"><div class="label">Skipped bytes</div><div class="value">${skipped}</div></div>
         <div class="stat-card"><div class="label">Pressure range</div><div class="value">${pMin}–${pMax}</div></div>
         <div class="stat-card"><div class="label">Avg temp</div><div class="value">${tAvg} °C</div></div>
