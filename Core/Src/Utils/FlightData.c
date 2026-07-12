@@ -8,8 +8,10 @@ FlightData_t GetFlightData(SystemState_t SystemState, SystemContext_t *SystemCon
 	FlightData_t FlightData;
 
 	FlightData.Sync = SD_LOG_SYNC;
+
 	FlightData.PressurePa = BMP581_FlightData.PressurePa;
 	FlightData.TemperatureC = BMP581_FlightData.TemperatureC;
+
 	FlightData.MagX = IIS2MDCTR_FlightData.MagX;
 	FlightData.MagY = IIS2MDCTR_FlightData.MagY;
 	FlightData.MagZ = IIS2MDCTR_FlightData.MagZ;
@@ -17,19 +19,22 @@ FlightData_t GetFlightData(SystemState_t SystemState, SystemContext_t *SystemCon
 	FlightData.GyroX = CalculateBiasedGyroscope(SystemContext, IIM42653_FlightData.GyroX, SystemContext->GyroBiasX);
 	FlightData.GyroY = CalculateBiasedGyroscope(SystemContext, IIM42653_FlightData.GyroY, SystemContext->GyroBiasY);
 	FlightData.GyroZ = CalculateBiasedGyroscope(SystemContext, IIM42653_FlightData.GyroZ, SystemContext->GyroBiasZ);
-	FlightData.AccelX = CalculateBiasedAcceleration(SystemContext, IIM42653_FlightData.AccelX, SystemContext->AccelBiasX);
-	FlightData.AccelY = CalculateBiasedAcceleration(SystemContext, IIM42653_FlightData.AccelY, SystemContext->AccelBiasY);
-	FlightData.AccelZ = CalculateBiasedAcceleration(SystemContext, IIM42653_FlightData.AccelZ, SystemContext->AccelBiasZ);
+
+	FlightData.AccelX = IIM42653_FlightData.AccelX;
+	FlightData.AccelY = IIM42653_FlightData.AccelY;
+	FlightData.AccelZ = IIM42653_FlightData.AccelZ;
 
 	FlightData.Latitude = 0;
 	FlightData.Longitude = 0;
 
-	FlightData.Altitude = CalculateAltitude(FlightData.PressurePa, FlightData.TemperatureC, SystemContext->ReferencePressurePa, SystemContext->ReferencePressurePaValid);
+	FlightData.Altitude = CalculateAltitude(SystemContext, FlightData.PressurePa, FlightData.TemperatureC);
 	FlightData.Altitude = CalculateFilteredAltitude(SystemContext, FlightData.Altitude);
 	FlightData.VelocityZ = CalculateVelocityZ(SystemContext, TIM2_HANDLE, FlightData.Altitude);
 
 	FlightData.Flags = SystemFaultFlags;
+	FlightData.BatteryVoltage = 0;
 	FlightData.State = SystemState;
+	FlightData.SyncEnd = SD_LOG_SYNC_END;
 
 	return FlightData;
 }

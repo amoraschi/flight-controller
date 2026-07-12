@@ -4,14 +4,14 @@ float CalculateKelvinFromCelsius(float TemperatureC) {
     return TemperatureC + 273.15f;
 }
 
-float CalculateAltitude(float PressurePa, float Temperature, float ReferencePressurePa, bool ReferencePressurePaValid) {
-    if (PressurePa <= 0.0f || ReferencePressurePa <= 0.0f || !ReferencePressurePaValid) {
+float CalculateAltitude(SystemContext_t *SystemContext, float PressurePa, float Temperature) {
+    if (PressurePa <= 0.0f || SystemContext->ReferencePressurePa <= 0.0f || !(SystemContext->ReferencePressurePaValid)) {
         return 0.0f;
     }
 
     float TemperatureK = CalculateKelvinFromCelsius(Temperature);
 
-    return (GAS_CONSTANT * TemperatureK / GRAV_CONSTANT) * logf(ReferencePressurePa / PressurePa);
+    return (GAS_CONSTANT * TemperatureK / GRAV_CONSTANT) * logf(SystemContext->ReferencePressurePa / PressurePa);
 }
 
 float CalculateFilteredAltitude(SystemContext_t *SystemContext, float RawAltitude) {

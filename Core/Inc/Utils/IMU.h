@@ -8,9 +8,6 @@
 float CalculateGyroscope(uint8_t MSB, uint8_t LSB, float Factor);
 float CalculateAcceleration(uint8_t MSB, uint8_t LSB, float Factor);
 
-void CalibrateAccelerometer(FlightData_t FlightData, SystemContext_t *SystemContext, float *AccelSumX, float *AccelSumY, float *AccelSumZ, uint16_t *AccelSampleCount, uint16_t *AccelDiscardCount);
-float CalculateBiasedAcceleration(SystemContext_t *SystemContext, float Value, float Bias);
-
 void CalibrateGyroscope(FlightData_t FlightData, SystemContext_t *SystemContext, float *GyroSumX, float *GyroSumY, float *GyroSumZ, uint16_t *GyroSampleCount, uint16_t *GyroDiscardCount);
 float CalculateBiasedGyroscope(SystemContext_t *SystemContext, float Value, float Bias);
 

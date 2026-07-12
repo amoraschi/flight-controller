@@ -10,42 +10,42 @@ static SDLoggingBuffer_t *WriteBuffer = NULL;
 
 volatile uint64_t dbg_write_fault = 0;
 
-void CreateSDLoggingTask(SystemContext_t *xSystemContext, const UBaseType_t Priority, const uint16_t StackSize) {
+void CreateSDLoggingTask(SystemContext_t *SystemContext, const UBaseType_t Priority, const uint16_t StackSize) {
     xTaskCreate(
         SDLoggingTask,
         "SD_LOGGING_TASK",
         StackSize,
-        xSystemContext,
+        SystemContext,
         Priority,
         &SDLoggingTaskHandle
     );
 }
 
 void SDLoggingTask(void *pvParameters) {
-    SystemContext_t *xSystemContext = pvParameters;
+    SystemContext_t *SystemContext = pvParameters;
 
     MountAndOpen();
 
-    // ReSharper disable once CppDFAEndlessLoop
     for (;;) {
         FlightData_t FlightData;
 
-        if (xQueueReceive(SDLoggingQueue, &FlightData, 0) == pdPASS) {
-            if (xSystemContext->SDLoggingEnabled) {
-                ActiveBuffer->Records[ActiveBuffer->Count++] = FlightData;
+        HAL_StatusTypeDef SDQueueStatus = xQueueReceive(SDLoggingQueue, &FlightData, 0);
 
-                if (ActiveBuffer->Count >= SD_LOGGING_RECORDS_PER_BUFFER) {
-                    WriteBuffer = ActiveBuffer;
-                    ActiveBuffer = (ActiveBuffer == &BufferA) ? &BufferB : &BufferA;
-                    ActiveBuffer->Count = 0;
+        if (SDQueueStatus == pdPASS && SystemContext->SDLoggingEnabled) {
+			ActiveBuffer->Records[ActiveBuffer->Count++] = FlightData;
 
-                    if (WriteLoggingBuffer(WriteBuffer) != FR_OK) {
-                        dbg_write_fault++;
-                    }
-                    WriteBuffer->Count = 0;
-                    f_sync(&SDFile);
-                }
-            }
+			if (ActiveBuffer->Count >= SD_LOGGING_RECORDS_PER_BUFFER) {
+				WriteBuffer = ActiveBuffer;
+				ActiveBuffer = (ActiveBuffer == &BufferA) ? &BufferB : &BufferA;
+				ActiveBuffer->Count = 0;
+
+				if (WriteLoggingBuffer(WriteBuffer) != FR_OK) {
+					dbg_write_fault++;
+				}
+
+				WriteBuffer->Count = 0;
+				f_sync(&SDFile);
+			}
         }
 
         // if (!xSystemContext->SDLoggingEnabled && SDLoggingEvent.CurrentSystemState == STATE_LANDED) {

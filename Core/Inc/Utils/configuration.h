@@ -40,5 +40,6 @@
 #define SD_LOGGING_RECORDS_PER_BUFFER       500
 #define SD_SYNC_INTERVAL_TICKS 				pdMS_TO_TICKS(1000)
 #define SD_LOG_SYNC                         0xCAFE
+#define SD_LOG_SYNC_END                     0xBE
 
 #endif //CONFIGURATION_H

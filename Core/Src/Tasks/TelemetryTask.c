@@ -3,8 +3,8 @@
 #include <string.h>
 #include <Tasks/TelemetryTask.h>
 
-/* TODO: */
-__attribute__((section(".dma_buffer"))) uint8_t TELEMETRY_RX_BUFFER[TELEMETRY_RX_BUFFER_SIZE];
+__attribute__((section(".dma_buffer")))
+uint8_t TELEMETRY_RX_BUFFER[TELEMETRY_RX_BUFFER_SIZE];
 
 TaskHandle_t TelemetryTaskHandle;
 
@@ -26,7 +26,6 @@ void TelemetryTask(void *pvParameters) {
 
     for (;;) {
         uint32_t Size = 0;
-        // The notification value carries the received byte count for this DMA event.
         xTaskNotifyWait(0, UINT32_MAX, &Size, portMAX_DELAY);
 
         // ParseIncomingPacket(TELEMETRY_RX_BUFFER, (uint16_t)Size);

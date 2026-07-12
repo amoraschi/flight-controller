@@ -4,6 +4,7 @@
 #include "Sensors/IIS2MDCTR.h"
 #include "Sensors/IIM42653.h"
 #include "Sensors/BMP581.h"
+#include "Utils/shared.h"
 
 typedef struct {
     BMP581_SensorData_t Slot[2];
@@ -20,7 +21,7 @@ typedef struct {
     volatile uint8_t WriteIndex;
 } IIS2MDCTR_Mailbox_t;
 
-void BUZZER_Beep(uint32_t Duration);
+void Buzzer_Beep(uint32_t Duration);
 
 void BMP581_Mailbox_Publish(const uint8_t *RXBuffer);
 void BMP581_Mailbox_Read(BMP581_SensorData_t *Out);

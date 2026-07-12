@@ -270,10 +270,12 @@ const FORMATS = {
             r.Altitude = dv.getFloat32(o, true); o += 4;
             r.VelocityZ = dv.getFloat32(o, true); o += 4;
             r.Flags = dv.getUint32(o, true); o += 4;
+            r.BatteryVoltage = dv.getFloat32(o, true); o += 4;
             r.State = dv.getUint8(o); o += 1;
+            r.SyncEnd = dv.getUint8(o); o += 1;
             return { record: r, size: o - offset };
         },
-        recordSize: 67
+        recordSize: 72
     },
     v1: {
         parse(dv, offset) {
@@ -457,6 +459,7 @@ function redrawAllCharts() {
     const accent = style.getPropertyValue('--accent').trim();
     const purple = style.getPropertyValue('--purple').trim();
     const cyan = style.getPropertyValue('--cyan').trim();
+    const yellow = style.getPropertyValue('--yellow').trim();
 
     const chartDefs = [
         { key: 'accel', datasets: [
@@ -478,6 +481,7 @@ function redrawAllCharts() {
         { key: 'temp', datasets: [{ data: getCol(visible, 'TemperatureC'), color: cyan }] },
         { key: 'alt', datasets: [{ data: getCol(visible, 'Altitude'), color: purple }] },
         { key: 'vel', datasets: [{ data: getCol(visible, 'VelocityZ'), color: green }] },
+        { key: 'voltage', datasets: [{ data: getCol(visible, 'BatteryVoltage'), color: yellow }] },
     ];
 
     if (visible[0] && visible[0].State !== undefined) {
@@ -503,6 +507,7 @@ function renderCharts() {
         { key: 'temp', title: 'Temperature' },
         { key: 'alt', title: 'Altitude' },
         { key: 'vel', title: 'Velocity Z' },
+        { key: 'voltage', title: 'Battery Voltage' },
     ];
 
     if (allRecords[0] && allRecords[0].State !== undefined) {
@@ -605,6 +610,9 @@ function renderStats(records, skipped) {
     const pMax = Math.max(...pressure).toFixed(1);
     const tAvg = (temp.reduce((a, b) => a + b, 0) / n).toFixed(1);
     const altRange = (Math.max(...alt) - Math.min(...alt)).toFixed(3);
+    const voltage = getCol(records, 'BatteryVoltage');
+    const vMin = Math.min(...voltage).toFixed(2);
+    const vMax = Math.max(...voltage).toFixed(2);
     const states = records[0] && records[0].State !== undefined
         ? [...new Set(getCol(records, 'State'))].sort((a,b) => a-b).join(', ') : '—';
 
@@ -614,6 +622,7 @@ function renderStats(records, skipped) {
         <div class="stat-card"><div class="label">Pressure range</div><div class="value">${pMin}–${pMax}</div></div>
         <div class="stat-card"><div class="label">Avg temp</div><div class="value">${tAvg} °C</div></div>
         <div class="stat-card"><div class="label">Alt range</div><div class="value">${altRange} m</div></div>
+        <div class="stat-card"><div class="label">Battery</div><div class="value">${vMin}–${vMax} V</div></div>
         <div class="stat-card"><div class="label">States</div><div class="value">${states}</div></div>
     `;
 }

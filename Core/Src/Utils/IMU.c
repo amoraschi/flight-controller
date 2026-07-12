@@ -9,34 +9,6 @@ float CalculateAcceleration(uint8_t MSB, uint8_t LSB, float Factor) {
     return ((int16_t)((MSB << 8) | LSB)) * Factor;
 }
 
-void CalibrateAccelerometer(FlightData_t FlightData, SystemContext_t *SystemContext, float *AccelSumX, float *AccelSumY, float *AccelSumZ, uint16_t *AccelSampleCount, uint16_t *AccelDiscardCount) {
-    if (SystemContext->AccelCalibrationValid) {
-        return;
-    }
-
-    if ((*AccelDiscardCount) < ACCEL_CALIBRATION_DISCARD_SAMPLES) {
-        (*AccelDiscardCount)++;
-        return;
-    }
-
-    (*AccelSumX) += FlightData.AccelX;
-    (*AccelSumY) += FlightData.AccelY;
-    (*AccelSumZ) += FlightData.AccelZ;
-    (*AccelSampleCount)++;
-
-    if ((*AccelSampleCount) >= ACCEL_CALIBRATION_SAMPLES) {
-        const float InvCount = 1.0f / (float)(*AccelSampleCount);
-        SystemContext->AccelBiasX = (*AccelSumX) * InvCount;
-        SystemContext->AccelBiasY = (*AccelSumY) * InvCount;
-        SystemContext->AccelBiasZ = (*AccelSumZ) * InvCount;
-        SystemContext->AccelCalibrationValid = true;
-    }
-}
-
-float CalculateBiasedAcceleration(SystemContext_t *SystemContext, float Value, float Bias) {
-    return SystemContext->AccelCalibrationValid ? Value - Bias : Value;
-}
-
 void CalibrateGyroscope(FlightData_t FlightData, SystemContext_t *SystemContext, float *GyroSumX, float *GyroSumY, float *GyroSumZ, uint16_t *GyroSampleCount, uint16_t *GyroDiscardCount) {
     if (SystemContext->GyroCalibrationValid) {
         return;

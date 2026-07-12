@@ -1,9 +1,9 @@
 #include "stm32h7xx_hal.h"
-#include <stdio.h>
 #include <Sensors/Sensors.h>
 #include <States/StateHandlers.h>
 #include <Tasks/StateMachineTask.h>
 #include <Utils/FlightData.h>
+#include "Managers/Managers.h"
 #include "queue.h"
 
 TaskHandle_t StateMachineTaskHandle;
@@ -33,7 +33,8 @@ void StateMachineTask(void *pvParameters) {
     OnStateEntry(CurrentSystemState, SystemContext);
 	HandleSensors(SystemContext, CurrentSystemState);
 
-	BUZZER_Beep(100);
+    SerialInit();
+    Buzzer_Beep(100);
 
     for (;;) {
         // TODO: Revise timeout
@@ -56,27 +57,24 @@ void StateMachineTask(void *pvParameters) {
             NextSystemState = HandleState(CurrentSystemState, SystemContext, FlightData, Received);
         }
 
-        if (NextSystemState != CurrentSystemState) {
+        bool StateChanged = NextSystemState != CurrentSystemState;
+        if (StateChanged) {
             OnStateEntry(NextSystemState, SystemContext);
             HandleSensors(SystemContext, NextSystemState);
             CurrentSystemState = NextSystemState;
 
             // TODO: Remove debug code
-             BUZZER_Beep(5);
+            Buzzer_Beep(5);
         }
 
-        if (SDLoggingQueue != NULL) {
-            xQueueSend(SDLoggingQueue, &FlightData, 0);
-        }
+        if (SDLoggingQueue != NULL && !StateChanged) {
+			xQueueSend(SDLoggingQueue, &FlightData, 0);
+		}
+
+        SerialSendFlightData(&FlightData);
 
         dbg_current_state = CurrentSystemState;
         dbg_system_faults = SystemFaultFlags;
-
-        const uint8_t *pBytes = (const uint8_t *)&FlightData;
-        for (uint32_t i = 0; i < sizeof(FlightData_t); i++) {
-            printf("%02X", pBytes[i]);
-        }
-        printf("\r\n");
 
         vTaskDelay(pdMS_TO_TICKS(10));
     }

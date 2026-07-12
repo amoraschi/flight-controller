@@ -52,7 +52,6 @@ void CalibrationStateEntry(SystemContext_t *ctx) {
 SystemState_t CalibrationStateHandler(SystemContext_t *ctx, FlightData_t FlightData, BaseType_t rx_status) {
     if (rx_status == pdPASS) {
         CalibratePressure(FlightData, ctx, &PressureSumPa, &PressureSampleCount, &PressureDiscardCount);
-//        CalibrateAccelerometer(StateEvent, ctx, &AccelSumX, &AccelSumY, &AccelSumZ, &AccelSampleCount, &AccelDiscardCount);
         CalibrateGyroscope(FlightData, ctx, &GyroSumX, &GyroSumY, &GyroSumZ, &GyroSampleCount, &GyroDiscardCount);
 
         ctx->AccelCalibrationValid = 1;

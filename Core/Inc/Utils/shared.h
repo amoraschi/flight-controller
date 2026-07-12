@@ -92,7 +92,9 @@ typedef struct {
     float Altitude;
     float VelocityZ;
     uint32_t Flags;
+    float BatteryVoltage;
     uint8_t State;
+    uint8_t SyncEnd;
 } FlightData_t;
 #pragma pack(pop)
 
@@ -114,7 +116,6 @@ extern SD_HandleTypeDef hsd1;
 extern SPI_HandleTypeDef hspi2;
 extern TIM_HandleTypeDef htim2;
 extern UART_HandleTypeDef huart1;
-extern DMA_HandleTypeDef hdma_usart1_rx;
 
 #define BMP581_HANDLE      (&hi2c2)
 #define IIM42653_HANDLE    (&hspi2)
