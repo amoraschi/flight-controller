@@ -30,6 +30,7 @@
 #include <Tasks/SDLoggingTask.h>
 #include <Tasks/StateMachineTask.h>
 #include <Tasks/TelemetryTask.h>
+#include <Tasks/SensorConfigTask.h>
 #include "Sensors/Sensors.h"
 #include "Protocol/Protocol.h"
 
@@ -190,6 +191,7 @@ int main(void)
   CommandQueue = xQueueCreate(QUEUE_LENGTH, sizeof(CommandType_t));
 
   CreateTelemetryTask(&huart1, tskIDLE_PRIORITY + 4, 256);
+  CreateSensorConfigTask(&SystemContext, tskIDLE_PRIORITY + 3, 256);
   CreateStateMachineTask(&SystemContext, tskIDLE_PRIORITY + 6, 256);
   CreateSDLoggingTask(&SystemContext, tskIDLE_PRIORITY + 1, 1024);
 

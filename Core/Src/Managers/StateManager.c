@@ -3,6 +3,7 @@
 #include "Utils/shared.h"
 #include "timers.h"
 #include "Protocol/Protocol.h"
+#include <Tasks/SensorConfigTask.h>
 
 void StartSensorTimers(void) {
 	xTimerStart(TimerIIM42653, 0);
@@ -17,6 +18,8 @@ void StopSensorTimers(void) {
 }
 
 void OnStateEntry(const SystemState_t CurrentSystemState, SystemContext_t *SystemContext) {
+    xTaskNotify(SensorConfigTaskHandle, (uint32_t)CurrentSystemState, eSetValueWithOverwrite);
+
     switch (CurrentSystemState) {
         case STATE_IDLE:
             IdleStateEntry(SystemContext);

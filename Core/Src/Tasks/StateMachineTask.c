@@ -32,7 +32,6 @@ void StateMachineTask(void *pvParameters) {
     SystemState_t CurrentSystemState = STATE_IDLE;
 
     OnStateEntry(CurrentSystemState, SystemContext);
-	HandleSensors(SystemContext, CurrentSystemState);
 
 //    BatteryInit();
     SerialInit();
@@ -62,7 +61,6 @@ void StateMachineTask(void *pvParameters) {
         bool StateChanged = NextSystemState != CurrentSystemState;
         if (StateChanged) {
             OnStateEntry(NextSystemState, SystemContext);
-            HandleSensors(SystemContext, NextSystemState);
             CurrentSystemState = NextSystemState;
 
             // TODO: Remove debug code
