@@ -1,18 +1,18 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
-#define STATE_EVENT_QUEUE_LENGTH    3
-#define SENSOR_MODE_QUEUE_LENGTH    1
+#define QUEUE_LENGTH    3
 
-#define PACKET_HEADER      0xCAFE
-#define PACKET_HEADER_LSB  (PACKET_HEADER & 0xFF)
-#define PACKET_HEADER_MSB  ((PACKET_HEADER >> 8) & 0xFF)
+#define PACKET_HEADER      	0xCAFE
+#define PACKET_HEADER_LSB  	(PACKET_HEADER & 0xFF)
+#define PACKET_HEADER_MSB  	((PACKET_HEADER >> 8) & 0xFF)
+#define PACKET_FOOTER		0xBE
 
 #define HIL_MODE                    0
 #define EXTERNAL_COMMANDS           1
 #define AUTO_START_CALIBRATION		1
 
-#define BUZZER_SILENT				0
+#define BUZZER_SILENT				1
 
 // Altitude configuration
 #define ALTITUDE_IIR_FILTER_ALPHA    0.1f
@@ -33,7 +33,5 @@
 
 // SD Configuration
 #define SD_LOGGING_RECORDS_PER_BUFFER       1000
-#define SD_LOG_SYNC                         0xCAFE
-#define SD_LOG_SYNC_END                     0xBE
 
 #endif //CONFIGURATION_H

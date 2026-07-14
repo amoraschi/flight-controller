@@ -7,7 +7,7 @@ void PrelaunchStateEntry(SystemContext_t *ctx) {
 }
 
 SystemState_t PrelaunchStateHandler(SystemContext_t *Context, FlightData_t FlightData) {
-	if (FlightData.VelocityZ > PRELAUNCH_BURN_VEL_Z_THRESHOLD) {
+	if (FlightData.VelY > PRELAUNCH_BURN_VEL_Z_THRESHOLD) {
 		return STATE_BURN;
 	}
 

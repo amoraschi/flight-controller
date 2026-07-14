@@ -2,13 +2,12 @@
 #include "Sensors/Sensors.h"
 #include "Utils/IMU.h"
 #include "Utils/Altitude.h"
-#include "Utils/Velocity.h"
 #include "Utils/Battery.h"
 
 FlightData_t GetFlightData(SystemState_t SystemState, SystemContext_t *SystemContext, IIM42653_SensorData_t IIM42653_FlightData, BMP581_SensorData_t BMP581_FlightData, IIS2MDCTR_SensorData_t IIS2MDCTR_FlightData) {
 	FlightData_t FlightData;
 
-	FlightData.Sync = SD_LOG_SYNC;
+	FlightData.Sync = PACKET_HEADER;
 	FlightData.Tick = xTaskGetTickCount();
 
 	FlightData.PressurePa = BMP581_FlightData.PressurePa;
@@ -31,12 +30,11 @@ FlightData_t GetFlightData(SystemState_t SystemState, SystemContext_t *SystemCon
 
 	FlightData.Altitude = CalculateAltitude(SystemContext, FlightData.PressurePa, FlightData.TemperatureC);
 	FlightData.Altitude = CalculateFilteredAltitude(SystemContext, FlightData.Altitude);
-	FlightData.VelocityZ = CalculateVelocityZ(SystemContext, TIM2_HANDLE, FlightData.Altitude);
 
 	FlightData.Flags = SystemFaultFlags;
 //	FlightData.BatteryVoltage = BatteryGetVoltage();
 	FlightData.State = SystemState;
-	FlightData.SyncEnd = SD_LOG_SYNC_END;
+	FlightData.SyncEnd = PACKET_FOOTER;
 
 	return FlightData;
 }

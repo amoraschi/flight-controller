@@ -7,7 +7,7 @@ void BurnStateEntry(SystemContext_t *ctx) {
 
 SystemState_t BurnStateHandler(SystemContext_t *Context, FlightData_t FlightData) {
 	// TODO: Revise, hysteresis, use acceleration if possible
-	if (FlightData.VelocityZ < BURN_APOGEE_VEL_Z_THRESHOLD) {
+	if (FlightData.VelY < BURN_APOGEE_VEL_Z_THRESHOLD) {
 		return STATE_APOGEE;
 	}
 

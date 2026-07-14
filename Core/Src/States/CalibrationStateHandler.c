@@ -1,7 +1,6 @@
 #include "States/StateHandlers.h"
 #include "Utils/Barometer.h"
 #include "Utils/IMU.h"
-#include "Utils/Velocity.h"
 
 static float PressureSumPa;
 static uint16_t PressureSampleCount;
@@ -30,8 +29,6 @@ void CalibrationStateEntry(SystemContext_t *ctx) {
     GyroSumZ = 0.0f;
     GyroSampleCount = 0;
     GyroDiscardCount = 0;
-
-    ResetVelocityZWindow();
 }
 
 SystemState_t CalibrationStateHandler(SystemContext_t *Context, FlightData_t FlightData) {
