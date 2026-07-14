@@ -33,6 +33,12 @@ void OnStateEntry(const SystemState_t CurrentSystemState, SystemContext_t *Syste
         case STATE_BURN:
             BurnStateEntry(SystemContext);
             break;
+        case STATE_PASSIVE_BURNOUT:
+            PassiveBurnoutStateEntry(SystemContext);
+            break;
+        case STATE_ACTIVE_BURNOUT:
+            ActiveBurnoutStateEntry(SystemContext);
+            break;
         case STATE_APOGEE:
             ApogeeStateEntry(SystemContext);
             break;
@@ -115,6 +121,12 @@ SystemState_t HandleState(SystemState_t CurrentSystemState, SystemContext_t *Sys
 			break;
 		case STATE_BURN:
 			return BurnStateHandler(SystemContext, SensorData);
+			break;
+		case STATE_PASSIVE_BURNOUT:
+			return PassiveBurnoutStateHandler(SystemContext, SensorData);
+			break;
+		case STATE_ACTIVE_BURNOUT:
+			return ActiveBurnoutStateHandler(SystemContext, SensorData);
 			break;
 		case STATE_APOGEE:
 			return ApogeeStateHandler(SystemContext, SensorData);

@@ -19,13 +19,15 @@ typedef enum {
 } MsgType_t;
 
 typedef enum {
-    STATE_IDLE,         // Initialize sensors at low power
-    STATE_CALIBRATION,  // Remote command, maximize sensor output for calibration
-    STATE_PRELAUNCH,    // Initialize SD logging
-    STATE_BURN,         // Acceleration detected
-    STATE_APOGEE,       // Apogee detected, drogue parachute deploy
-    STATE_PARACHUTE,    // Altitude threshold, main parachute deploy
-    STATE_LANDED,       // Landed, turn off except GPS
+    STATE_IDLE,         	// Initialize sensors at low power
+    STATE_CALIBRATION,  	// Remote command, maximize sensor output for calibration
+    STATE_PRELAUNCH,    	// Initialize SD logging
+    STATE_BURN,             // Acceleration detected
+    STATE_PASSIVE_BURNOUT,  // Burnout, still ascending
+    STATE_ACTIVE_BURNOUT,   // Active control
+    STATE_APOGEE,           // Apogee detected, drogue parachute deploy
+    STATE_PARACHUTE,    	// Altitude threshold, main parachute deploy
+    STATE_LANDED,       	// Landed, turn off except GPS
 
     STATE_GROUND_ABORT,
     STATE_ASCENT_ABORT,
