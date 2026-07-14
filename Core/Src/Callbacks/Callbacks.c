@@ -40,13 +40,13 @@ void HAL_UART_ErrorCallback(UART_HandleTypeDef *huart) {
 }
 
 void IIM42653_Timer_Callback(TimerHandle_t xTimer) {
-//	bool ready = false;
-//	IIM42653_CheckDataReady(IIM42653_HANDLE, &ready);
-//	if (ready) {
-	IIM42653_TXBuf[0] = IIM42653_REG_ACCEL_DATA_X1_UI | IIM42653_READ_MASK;
-	IIM42653_SelectCS();
-	HAL_SPI_TransmitReceive_DMA(IIM42653_HANDLE, IIM42653_TXBuf, IIM42653_RXBuf, IIM42653_SENSOR_DATA_SIZE);
-//	}
+	bool Ready = false;
+	IIM42653_CheckDataReady(IIM42653_HANDLE, &Ready);
+	if (Ready) {
+		IIM42653_TXBuf[0] = IIM42653_REG_ACCEL_DATA_X1_UI | IIM42653_READ_MASK;
+		IIM42653_SelectCS();
+		HAL_SPI_TransmitReceive_DMA(IIM42653_HANDLE, IIM42653_TXBuf, IIM42653_RXBuf, IIM42653_SENSOR_DATA_SIZE);
+	}
 }
 
 void BMP581_Timer_Callback(TimerHandle_t xTimer) {

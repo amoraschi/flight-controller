@@ -130,7 +130,7 @@ HAL_StatusTypeDef IIM42653_EnableIdle(SPI_HandleTypeDef *IIM42653_Handle) {
         return HAL_ERROR;
     }
 
-    return IIM42653_SetBit(IIM42653_Handle, IIM42653_REG_PWR_MGMT0, IIM42653_REG_PWR_MGMT0_IDLE, false);
+    return IIM42653_SetBit(IIM42653_Handle, IIM42653_REG_PWR_MGMT0, IIM42653_REG_PWR_MGMT0_IDLE, true);
 }
 
 HAL_StatusTypeDef IIM42653_DisableIdle(SPI_HandleTypeDef *IIM42653_Handle) {
@@ -138,7 +138,7 @@ HAL_StatusTypeDef IIM42653_DisableIdle(SPI_HandleTypeDef *IIM42653_Handle) {
         return HAL_ERROR;
     }
 
-    return IIM42653_SetBit(IIM42653_Handle, IIM42653_REG_PWR_MGMT0, IIM42653_REG_PWR_MGMT0_IDLE, true);
+    return IIM42653_SetBit(IIM42653_Handle, IIM42653_REG_PWR_MGMT0, IIM42653_REG_PWR_MGMT0_IDLE, false);
 }
 
 HAL_StatusTypeDef IIM42653_SetGyroConfig(SPI_HandleTypeDef *IIM42653_Handle, uint8_t ODR, uint8_t FS) {
