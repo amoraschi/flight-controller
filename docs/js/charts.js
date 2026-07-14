@@ -64,6 +64,33 @@ function drawChart(canvas, datasets) {
         ctx.fillText(label, x, h - pad.bottom + 6);
     }
 
+    const dropLocalSet = new Set();
+    const dropRegions = [];
+    if (dropIndices.length > 0) {
+        for (const di of dropIndices) {
+            const li = di - startIdx;
+            if (li < 1 || li >= maxLen) continue;
+            dropLocalSet.add(li);
+            const x0 = pad.left + ((li - 1) / (maxLen - 1)) * plotW;
+            const x1 = pad.left + (li / (maxLen - 1)) * plotW;
+            dropRegions.push({ x0, x1: Math.max(x1, x0 + 4), di });
+        }
+    }
+
+    if (dropRegions.length > 0) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.rect(pad.left, pad.top, plotW, plotH);
+        for (const r of dropRegions) {
+            ctx.rect(r.x1, pad.top, 0, plotH);
+            ctx.rect(r.x0, pad.top, -(r.x0 - pad.left), plotH);
+        }
+        const outerPath = new Path2D();
+        outerPath.rect(pad.left, pad.top, plotW, plotH);
+        for (const r of dropRegions) outerPath.rect(r.x0, pad.top, r.x1 - r.x0, plotH);
+        ctx.clip(outerPath, 'evenodd');
+    }
+
     for (const ds of datasets) {
         ctx.strokeStyle = ds.color;
         ctx.lineWidth = 1.2;
@@ -77,24 +104,32 @@ function drawChart(canvas, datasets) {
         ctx.stroke();
     }
 
-    if (dropIndices.length > 0) {
-        const startIdx = Math.floor(viewStart * allRecords.length);
-        const endIdx = Math.floor(viewEnd * allRecords.length);
-        ctx.save();
-        ctx.strokeStyle = style.getPropertyValue('--red').trim();
-        ctx.lineWidth = 1;
-        ctx.globalAlpha = 0.6;
-        ctx.setLineDash([4, 3]);
-        for (const di of dropIndices) {
-            const localIdx = di - startIdx;
-            if (localIdx < 0 || localIdx >= maxLen) continue;
-            const x = pad.left + (localIdx / (maxLen - 1)) * plotW;
-            ctx.beginPath(); ctx.moveTo(x, pad.top); ctx.lineTo(x, pad.top + plotH); ctx.stroke();
-        }
+    if (dropRegions.length > 0) {
         ctx.restore();
+        const redColor = style.getPropertyValue('--red').trim();
+        for (const r of dropRegions) {
+            const rw = r.x1 - r.x0;
+            ctx.save();
+            ctx.globalAlpha = 0.18;
+            ctx.fillStyle = redColor;
+            ctx.fillRect(r.x0, pad.top, rw, plotH);
+            ctx.globalAlpha = 0.45;
+            ctx.strokeStyle = redColor;
+            ctx.lineWidth = 1;
+            ctx.beginPath();
+            ctx.rect(r.x0, pad.top, rw, plotH);
+            ctx.clip();
+            const spacing = 6;
+            for (let ly = pad.top; ly < pad.top + plotH + rw; ly += spacing) {
+                ctx.moveTo(r.x0, ly);
+                ctx.lineTo(r.x0 + rw, ly - rw);
+            }
+            ctx.stroke();
+            ctx.restore();
+        }
     }
 
-    chartMeta.set(canvas, { datasets, pad, plotW, plotH, yMin, yMax, maxLen, w: rect.width, h: rect.height });
+    chartMeta.set(canvas, { datasets, pad, plotW, plotH, yMin, yMax, maxLen, w: rect.width, h: rect.height, dropRegions });
 }
 
 function drawMinimap() {
@@ -230,30 +265,34 @@ function renderCharts() {
             if (idx < 0 || idx >= meta.maxLen) { tooltip.style.opacity = '0'; return; }
 
             const startIdx = Math.floor(viewStart * allRecords.length);
-            const SNAP_PX = 8;
-            for (const di of dropIndices) {
-                const localIdx = di - startIdx;
-                if (localIdx < 0 || localIdx >= meta.maxLen) continue;
-                const dropX = meta.pad.left + (localIdx / (meta.maxLen - 1)) * meta.plotW;
-                if (Math.abs(mx - dropX) <= SNAP_PX) { idx = localIdx; break; }
+
+            let inDrop = null;
+            if (meta.dropRegions) {
+                for (const r of meta.dropRegions) {
+                    if (mx >= r.x0 && mx <= r.x1) { inDrop = r; break; }
+                }
             }
-            const rec = allRecords[startIdx + idx];
-            const tickStr = rec && rec.Tick !== undefined ? ' · ' + ((rec.Tick - allRecords[0].Tick) / 1000).toFixed(2) + 's' : '';
-            let rows = '<div class="tt-sample">#' + (startIdx + idx) + tickStr + '</div>';
-            const absIdx = startIdx + idx;
-            if (dropIndices.includes(absIdx) && rec && allRecords[absIdx - 1]) {
-                const gap = rec.Tick - allRecords[absIdx - 1].Tick;
+
+            let rows;
+            if (inDrop) {
+                const prev = allRecords[inDrop.di - 1];
+                const curr = allRecords[inDrop.di];
+                const gap = curr.Tick - prev.Tick;
                 const medianDelta = getMedianDelta();
                 const missed = Math.round(gap / medianDelta) - 1;
-                rows += '<div class="tt-drop">DROPPED ' + missed + ' sample' + (missed !== 1 ? 's' : '') + ' · gap ' + gap + ' ms</div>';
-            }
-            const labels = meta.datasets.length === 3 ? ['X', 'Y', 'Z'] : null;
-            for (let d = 0; d < meta.datasets.length; d++) {
-                const ds = meta.datasets[d];
-                const val = ds.data[idx];
-                if (val === undefined) continue;
-                const label = labels ? labels[d] : '';
-                rows += `<div class="tt-row"><span class="tt-dot" style="background:${ds.color}"></span>${label ? label + ': ' : ''}${formatNum(val)}</div>`;
+                rows = '<div class="tt-drop">DROPPED ' + missed + ' sample' + (missed !== 1 ? 's' : '') + ' · gap ' + gap + ' ms</div>';
+            } else {
+                const rec = allRecords[startIdx + idx];
+                const tickStr = rec && rec.Tick !== undefined ? ' · ' + ((rec.Tick - allRecords[0].Tick) / 1000).toFixed(2) + 's' : '';
+                rows = '<div class="tt-sample">#' + (startIdx + idx) + tickStr + '</div>';
+                const labels = meta.datasets.length === 3 ? ['X', 'Y', 'Z'] : null;
+                for (let d = 0; d < meta.datasets.length; d++) {
+                    const ds = meta.datasets[d];
+                    const val = ds.data[idx];
+                    if (val === undefined) continue;
+                    const label = labels ? labels[d] : '';
+                    rows += `<div class="tt-row"><span class="tt-dot" style="background:${ds.color}"></span>${label ? label + ': ' : ''}${formatNum(val)}</div>`;
+                }
             }
             tooltip.innerHTML = rows;
             tooltip.style.opacity = '1';
@@ -271,22 +310,24 @@ function renderCharts() {
             const ctx = canvas.getContext('2d');
             const dpr = window.devicePixelRatio || 1;
             drawChart(canvas, meta.datasets);
-            ctx.save();
-            ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-            const cx = meta.pad.left + (idx / (meta.maxLen - 1)) * meta.plotW;
-            ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-dim').trim();
-            ctx.lineWidth = 1;
-            ctx.setLineDash([3, 3]);
-            ctx.beginPath(); ctx.moveTo(cx, meta.pad.top); ctx.lineTo(cx, meta.pad.top + meta.plotH); ctx.stroke();
-            ctx.setLineDash([]);
-            for (const ds of meta.datasets) {
-                const val = ds.data[idx];
-                if (val === undefined) continue;
-                const cy = meta.pad.top + (1 - (val - meta.yMin) / (meta.yMax - meta.yMin)) * meta.plotH;
-                ctx.fillStyle = ds.color;
-                ctx.beginPath(); ctx.arc(cx, cy, 3.5, 0, Math.PI * 2); ctx.fill();
+            if (!inDrop) {
+                ctx.save();
+                ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+                const cx = meta.pad.left + (idx / (meta.maxLen - 1)) * meta.plotW;
+                ctx.strokeStyle = getComputedStyle(document.documentElement).getPropertyValue('--text-dim').trim();
+                ctx.lineWidth = 1;
+                ctx.setLineDash([3, 3]);
+                ctx.beginPath(); ctx.moveTo(cx, meta.pad.top); ctx.lineTo(cx, meta.pad.top + meta.plotH); ctx.stroke();
+                ctx.setLineDash([]);
+                for (const ds of meta.datasets) {
+                    const val = ds.data[idx];
+                    if (val === undefined) continue;
+                    const cy = meta.pad.top + (1 - (val - meta.yMin) / (meta.yMax - meta.yMin)) * meta.plotH;
+                    ctx.fillStyle = ds.color;
+                    ctx.beginPath(); ctx.arc(cx, cy, 3.5, 0, Math.PI * 2); ctx.fill();
+                }
+                ctx.restore();
             }
-            ctx.restore();
         });
 
         canvas.addEventListener('mouseleave', () => {
