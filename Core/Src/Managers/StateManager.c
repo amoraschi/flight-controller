@@ -2,6 +2,7 @@
 #include "Sensors/Sensors.h"
 #include "Utils/shared.h"
 #include "timers.h"
+#include "Protocol/Protocol.h"
 
 void StartSensorTimers(void) {
 	xTimerStart(TimerIIM42653, 0);

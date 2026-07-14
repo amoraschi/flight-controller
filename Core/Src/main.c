@@ -31,6 +31,7 @@
 #include <Tasks/StateMachineTask.h>
 #include <Tasks/TelemetryTask.h>
 #include "Sensors/Sensors.h"
+#include "Protocol/Protocol.h"
 
 #include <timers.h>
 #include "Utils/Battery.h"
