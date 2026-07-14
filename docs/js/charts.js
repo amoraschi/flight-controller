@@ -156,7 +156,11 @@ function redrawAllCharts() {
         { key: 'pressure', datasets: [{ data: getCol(visible, 'PressurePa'), color: accent }] },
         { key: 'temp', datasets: [{ data: getCol(visible, 'TemperatureC'), color: cyan }] },
         { key: 'alt', datasets: [{ data: getCol(visible, 'Altitude'), color: purple }] },
-        { key: 'vel', datasets: [{ data: getCol(visible, 'VelocityZ'), color: green }] },
+        { key: 'vel', datasets: [
+            { data: getCol(visible, 'VelX'), color: red },
+            { data: getCol(visible, 'VelY'), color: green },
+            { data: getCol(visible, 'VelZ'), color: blue },
+        ]},
         { key: 'voltage', datasets: [{ data: getCol(visible, 'BatteryVoltage'), color: yellow }] },
     ];
 

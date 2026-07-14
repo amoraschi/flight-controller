@@ -1,5 +1,5 @@
 const SYNC = 0xCAFE;
-const RECORD_SIZE = 76;
+const RECORD_SIZE = 84;
 
 function parseRecord(dv, offset) {
     let o = offset;
@@ -20,7 +20,9 @@ function parseRecord(dv, offset) {
     r.Latitude = dv.getInt32(o, true); o += 4;
     r.Longitude = dv.getInt32(o, true); o += 4;
     r.Altitude = dv.getFloat32(o, true); o += 4;
-    r.VelocityZ = dv.getFloat32(o, true); o += 4;
+    r.VelX = dv.getFloat32(o, true); o += 4;
+    r.VelY = dv.getFloat32(o, true); o += 4;
+    r.VelZ = dv.getFloat32(o, true); o += 4;
     r.Flags = dv.getUint32(o, true); o += 4;
     r.BatteryVoltage = dv.getFloat32(o, true); o += 4;
     r.State = dv.getUint8(o); o += 1;
