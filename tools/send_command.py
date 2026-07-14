@@ -6,9 +6,9 @@ HEADER_MSB = 0xCA
 FOOTER = 0xBE
 
 COMMANDS = {
-    "calibrate": 0x01,
+    "reset": 0x01,
     "abort": 0x02,
-    "reset": 0x03,
+    "calibrate": 0x03,
 }
 
 

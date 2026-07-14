@@ -1,6 +1,8 @@
 #ifndef MANAGERS_H
 #define MANAGERS_H
 
+#include "Protocol/Protocol.h"
+
 void SerialInit(void);
 void SerialSendFlightData(const FlightData_t *FlightData);
 

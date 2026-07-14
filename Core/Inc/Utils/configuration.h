@@ -1,7 +1,7 @@
 #ifndef CONFIGURATION_H
 #define CONFIGURATION_H
 
-#define QUEUE_LENGTH    3
+#define QUEUE_LENGTH    5
 
 #define PACKET_HEADER      	0xCAFE
 #define PACKET_HEADER_LSB  	(PACKET_HEADER & 0xFF)
@@ -10,7 +10,7 @@
 
 #define HIL_MODE                    0
 #define EXTERNAL_COMMANDS           1
-#define AUTO_START_CALIBRATION		1
+#define AUTO_START_CALIBRATION		0
 
 #define BUZZER_SILENT				1
 

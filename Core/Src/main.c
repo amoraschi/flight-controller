@@ -81,10 +81,7 @@ const osThreadAttr_t defaultTask_attributes = {
 };
 /* USER CODE BEGIN PV */
 QueueHandle_t SDLoggingQueue;
-
-#if HIL_MODE
-QueueHandle_t HILModeQueue;
-#endif
+QueueHandle_t CommandQueue;
 
 TimerHandle_t TimerIIM42653;
 TimerHandle_t TimerBMP581;
@@ -188,15 +185,12 @@ int main(void)
   /* USER CODE BEGIN RTOS_THREADS */
   HAL_TIM_Base_Start(&htim2);
 
-  SDLoggingQueue = xQueueCreate(STATE_EVENT_QUEUE_LENGTH, sizeof(FlightData_t));
+  SDLoggingQueue = xQueueCreate(QUEUE_LENGTH, sizeof(FlightData_t));
+  CommandQueue = xQueueCreate(QUEUE_LENGTH, sizeof(CommandType_t));
 
-#if HIL_MODE
-  xHILModeQueue = xQueueCreate(STATE_EVENT_QUEUE_LENGTH, sizeof(SensorPayload_t));
-#endif
-
-  CreateTelemetryTask(&huart1, tskIDLE_PRIORITY + 3, 256);
-  CreateStateMachineTask(&SystemContext, tskIDLE_PRIORITY + 5, 256);
-  CreateSDLoggingTask(&SystemContext, tskIDLE_PRIORITY, 1024);
+  CreateTelemetryTask(&huart1, tskIDLE_PRIORITY + 4, 256);
+  CreateStateMachineTask(&SystemContext, tskIDLE_PRIORITY + 6, 256);
+  CreateSDLoggingTask(&SystemContext, tskIDLE_PRIORITY + 1, 1024);
 
   // TODO: Revise rate
   TimerIIM42653 = xTimerCreate("IIM42653", pdMS_TO_TICKS(10), pdTRUE, NULL, IIM42653_Timer_Callback);

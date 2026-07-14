@@ -51,8 +51,9 @@ void StateMachineTask(void *pvParameters) {
         FlightData = GetFlightData(CurrentSystemState, SystemContext, IIM42653_SensorData, BMP581_SensorData, IIS2MDCTR_SensorData);
         dbg_flight_data = FlightData;
 
-        // SystemState_t NextSystemState = HandleCommand(CurrentSystemState, &LatestStateEvent, pdFAIL);
-        SystemState_t NextSystemState = CurrentSystemState;
+        CommandType_t Command;
+        BaseType_t CommandReceived = xQueueReceive(CommandQueue, &Command, 0);
+        SystemState_t NextSystemState = HandleCommand(CurrentSystemState, Command, CommandReceived);
 
         if (NextSystemState == CurrentSystemState) {
             NextSystemState = HandleState(CurrentSystemState, SystemContext, FlightData);

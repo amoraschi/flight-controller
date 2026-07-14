@@ -19,12 +19,6 @@ typedef enum {
 } MsgType_t;
 
 typedef enum {
-    COMMAND_RESET = 0x01,
-    COMMAND_ABORT = 0x02,
-    COMMAND_CALIBRATION = 0x03
-} CommandType_t;
-
-typedef enum {
     STATE_IDLE,         // Initialize sensors at low power
     STATE_CALIBRATION,  // Remote command, maximize sensor output for calibration
     STATE_PRELAUNCH,    // Initialize SD logging
@@ -87,7 +81,9 @@ typedef struct {
     int32_t Latitude;
     int32_t Longitude;
     float Altitude;
-    float VelocityZ;
+    float VelX;
+    float VelY;
+    float VelZ;
     uint32_t Flags;
     float BatteryVoltage;
     uint8_t State;
@@ -96,10 +92,7 @@ typedef struct {
 #pragma pack(pop)
 
 extern QueueHandle_t SDLoggingQueue;
-
-#if HIL_MODE
-extern QueueHandle_t HILModeQueue;
-#endif
+extern QueueHandle_t CommandQueue;
 
 extern TimerHandle_t TimerIIM42653;
 extern TimerHandle_t TimerBMP581;
