@@ -190,7 +190,10 @@ function redrawAllCharts() {
         ]},
         { key: 'pressure', datasets: [{ data: getCol(visible, 'PressurePa'), color: accent }] },
         { key: 'temp', datasets: [{ data: getCol(visible, 'TemperatureC'), color: cyan }] },
-        { key: 'alt', datasets: [{ data: getCol(visible, 'Altitude'), color: purple }] },
+        { key: 'alt', datasets: [
+            { data: getCol(visible, 'Altitude'), color: purple },
+            { data: getCol(visible, 'RawAltitude'), color: accent },
+        ]},
         { key: 'vel', datasets: [
             { data: getCol(visible, 'VelX'), color: red },
             { data: getCol(visible, 'VelY'), color: green },
@@ -223,6 +226,22 @@ function redrawAllCharts() {
             { data: getCol(visible, 'SDQueueDepth'), color: accent },
             { data: getCol(visible, 'CommandQueueDepth'), color: cyan },
         ]},
+        { key: 'sddropped', datasets: [
+            { data: getCol(visible, 'SDDroppedCount'), color: red },
+        ]},
+        { key: 'lastcommand', datasets: [
+            { data: getCol(visible, 'LastCommandType'), color: accent },
+        ]},
+        { key: 'sensorerrors', datasets: [
+            { data: getCol(visible, 'BMP581ErrorCount'), color: red },
+            { data: getCol(visible, 'IIM42653ErrorCount'), color: green },
+            { data: getCol(visible, 'IIS2MDCTRErrorCount'), color: blue },
+        ]},
+        { key: 'sensorfreshness', datasets: [
+            { data: getCol(visible, 'BMP581StaleTicks'), color: red },
+            { data: getCol(visible, 'IIM42653StaleTicks'), color: green },
+            { data: getCol(visible, 'IIS2MDCTRStaleTicks'), color: blue },
+        ]},
     ];
 
     for (const def of chartDefs) {
@@ -245,7 +264,7 @@ function renderCharts() {
         { key: 'mag', title: 'Magnetometer', legend: [['X','legend-x'],['Y','legend-y'],['Z','legend-z']] },
         { key: 'pressure', title: 'Pressure' },
         { key: 'temp', title: 'Temperature' },
-        { key: 'alt', title: 'Altitude' },
+        { key: 'alt', title: 'Altitude', legend: [['Filtered','legend-purple'],['Raw','legend-accent']] },
         { key: 'vel', title: 'Velocity', legend: [['X','legend-x'],['Y','legend-y'],['Z','legend-z']] },
         { key: 'voltage', title: 'Battery Voltage' },
         { key: 'looptime', title: 'Loop Time (ms)', legend: [['Current','legend-accent'],['Max','legend-red']] },
@@ -254,6 +273,10 @@ function renderCharts() {
         { key: 'stackusage', title: 'Stack Usage (%)', legend: [['StateMachine','legend-x'],['SDProducer','legend-y'],['SDWriter','legend-z'],['Telemetry','legend-yellow']] },
         { key: 'heap', title: 'Heap (bytes)', legend: [['Free','legend-accent'],['Min Ever','legend-red']] },
         { key: 'queuedepth', title: 'Queue Depth', legend: [['SD','legend-accent'],['Command','legend-cyan']] },
+        { key: 'sddropped', title: 'SD Dropped Records' },
+        { key: 'lastcommand', title: 'Last Command Type' },
+        { key: 'sensorerrors', title: 'Sensor Error Count', legend: [['BMP581','legend-x'],['IIM42653','legend-y'],['IIS2MDCTR','legend-z']] },
+        { key: 'sensorfreshness', title: 'Sensor Staleness (ticks)', legend: [['BMP581','legend-x'],['IIM42653','legend-y'],['IIS2MDCTR','legend-z']] },
     ];
 
     if (allRecords[0] && allRecords[0].State !== undefined) {
