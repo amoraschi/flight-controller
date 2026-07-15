@@ -197,6 +197,10 @@ function redrawAllCharts() {
             { data: getCol(visible, 'VelZ'), color: blue },
         ]},
         { key: 'voltage', datasets: [{ data: getCol(visible, 'BatteryVoltage'), color: yellow }] },
+        { key: 'looptime', datasets: [
+            { data: getCol(visible, 'LoopExecutionUs'), color: accent },
+            { data: getCol(visible, 'LoopMaxExecutionUs'), color: red },
+        ]},
     ];
 
     for (const def of chartDefs) {
@@ -222,6 +226,7 @@ function renderCharts() {
         { key: 'alt', title: 'Altitude' },
         { key: 'vel', title: 'Velocity Z' },
         { key: 'voltage', title: 'Battery Voltage' },
+        { key: 'looptime', title: 'Loop Time (µs)', legend: [['Current','legend-accent'],['Max','legend-red']] },
     ];
 
     if (allRecords[0] && allRecords[0].State !== undefined) {

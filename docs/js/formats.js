@@ -1,31 +1,50 @@
 const SYNC = 0xCAFE;
-const RECORD_SIZE = 84;
+
+const FIELD_DEFS = [
+    { name: 'Sync',             type: 'uint16' },
+    { name: 'Tick',             type: 'uint32' },
+    { name: 'AccelX',           type: 'float32' },
+    { name: 'AccelY',           type: 'float32' },
+    { name: 'AccelZ',           type: 'float32' },
+    { name: 'GyroX',            type: 'float32' },
+    { name: 'GyroY',            type: 'float32' },
+    { name: 'GyroZ',            type: 'float32' },
+    { name: 'MagX',             type: 'float32' },
+    { name: 'MagY',             type: 'float32' },
+    { name: 'MagZ',             type: 'float32' },
+    { name: 'PressurePa',       type: 'float32' },
+    { name: 'TemperatureC',     type: 'float32' },
+    { name: 'Latitude',         type: 'int32' },
+    { name: 'Longitude',        type: 'int32' },
+    { name: 'Altitude',         type: 'float32' },
+    { name: 'VelX',             type: 'float32' },
+    { name: 'VelY',             type: 'float32' },
+    { name: 'VelZ',             type: 'float32' },
+    { name: 'Flags',            type: 'uint32' },
+    { name: 'BatteryVoltage',   type: 'float32' },
+    { name: 'LoopExecutionUs',  type: 'uint32' },
+    { name: 'LoopMaxExecutionUs', type: 'uint32' },
+    { name: 'State',            type: 'uint8' },
+    { name: 'SyncEnd',          type: 'uint8' },
+];
+
+const TYPE_INFO = {
+    uint8:   { size: 1, read: (dv, o) => dv.getUint8(o) },
+    uint16:  { size: 2, read: (dv, o) => dv.getUint16(o, true) },
+    uint32:  { size: 4, read: (dv, o) => dv.getUint32(o, true) },
+    int32:   { size: 4, read: (dv, o) => dv.getInt32(o, true) },
+    float32: { size: 4, read: (dv, o) => dv.getFloat32(o, true) },
+};
+
+const RECORD_SIZE = FIELD_DEFS.reduce((sum, f) => sum + TYPE_INFO[f.type].size, 0);
 
 function parseRecord(dv, offset) {
     let o = offset;
     const r = {};
-    r.Sync = dv.getUint16(o, true); o += 2;
-    r.Tick = dv.getUint32(o, true); o += 4;
-    r.AccelX = dv.getFloat32(o, true); o += 4;
-    r.AccelY = dv.getFloat32(o, true); o += 4;
-    r.AccelZ = dv.getFloat32(o, true); o += 4;
-    r.GyroX = dv.getFloat32(o, true); o += 4;
-    r.GyroY = dv.getFloat32(o, true); o += 4;
-    r.GyroZ = dv.getFloat32(o, true); o += 4;
-    r.MagX = dv.getFloat32(o, true); o += 4;
-    r.MagY = dv.getFloat32(o, true); o += 4;
-    r.MagZ = dv.getFloat32(o, true); o += 4;
-    r.PressurePa = dv.getFloat32(o, true); o += 4;
-    r.TemperatureC = dv.getFloat32(o, true); o += 4;
-    r.Latitude = dv.getInt32(o, true); o += 4;
-    r.Longitude = dv.getInt32(o, true); o += 4;
-    r.Altitude = dv.getFloat32(o, true); o += 4;
-    r.VelX = dv.getFloat32(o, true); o += 4;
-    r.VelY = dv.getFloat32(o, true); o += 4;
-    r.VelZ = dv.getFloat32(o, true); o += 4;
-    r.Flags = dv.getUint32(o, true); o += 4;
-    r.BatteryVoltage = dv.getFloat32(o, true); o += 4;
-    r.State = dv.getUint8(o); o += 1;
-    r.SyncEnd = dv.getUint8(o); o += 1;
+    for (const field of FIELD_DEFS) {
+        const info = TYPE_INFO[field.type];
+        r[field.name] = info.read(dv, o);
+        o += info.size;
+    }
     return { record: r, size: o - offset };
 }

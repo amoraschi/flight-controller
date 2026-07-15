@@ -177,6 +177,8 @@ body {
 .legend-x::before { background: var(--red) !important; }
 .legend-y::before { background: var(--green) !important; }
 .legend-z::before { background: var(--blue) !important; }
+.legend-accent::before { background: var(--accent) !important; }
+.legend-red::before { background: var(--red) !important; }
 .chart-container canvas { width: 100%; height: 180px; display: block; }
 
 input[type="file"] { display: none; }
