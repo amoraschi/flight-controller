@@ -38,7 +38,7 @@ Descomentar las siguientes secciones:
      TimerBattery = xTimerCreate("Battery", pdMS_TO_TICKS(500), pdTRUE, NULL, Battery_Timer_Callback);
 4. Core/Src/Tasks/StateMachineTask.c  → Descomentar la linea:
      BatteryInit();
-5. Core/Src/Utils/FlightData.c        → Descomentar la linea:
+5. Core/Src/Utils/FlightData.c        → Sustituir el 0 por la funcion de lectura de bateria:
      FlightData.BatteryVoltage = BatteryGetVoltage();
 
 ================================================================================
