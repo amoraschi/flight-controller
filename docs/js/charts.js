@@ -209,11 +209,11 @@ function redrawAllCharts() {
         { key: 'sdwrite', datasets: [
             { data: getCol(visible, 'SDWriteUs').map(v => v / 1000), color: accent },
         ]},
-        { key: 'stackwatermark', datasets: [
-            { data: getCol(visible, 'StackWatermarkStateMachine'), color: red },
-            { data: getCol(visible, 'StackWatermarkSDProducer'), color: green },
-            { data: getCol(visible, 'StackWatermarkSDWriter'), color: blue },
-            { data: getCol(visible, 'StackWatermarkTelemetry'), color: yellow },
+        { key: 'stackusage', datasets: [
+            { data: getCol(visible, 'StackUsageStateMachine'), color: red },
+            { data: getCol(visible, 'StackUsageSDProducer'), color: green },
+            { data: getCol(visible, 'StackUsageSDWriter'), color: blue },
+            { data: getCol(visible, 'StackUsageTelemetry'), color: yellow },
         ]},
         { key: 'heap', datasets: [
             { data: getCol(visible, 'HeapFreeBytes'), color: accent },
@@ -251,7 +251,7 @@ function renderCharts() {
         { key: 'looptime', title: 'Loop Time (ms)', legend: [['Current','legend-accent'],['Max','legend-red']] },
         { key: 'sensorlatency', title: 'Sensor Read Latency (ms)', legend: [['BMP581','legend-x'],['IIM42653','legend-y'],['IIS2MDCTR','legend-z']] },
         { key: 'sdwrite', title: 'SD Write Duration (ms)' },
-        { key: 'stackwatermark', title: 'Stack Watermark (words)', legend: [['StateMachine','legend-x'],['SDProducer','legend-y'],['SDWriter','legend-z'],['Telemetry','legend-yellow']] },
+        { key: 'stackusage', title: 'Stack Usage (%)', legend: [['StateMachine','legend-x'],['SDProducer','legend-y'],['SDWriter','legend-z'],['Telemetry','legend-yellow']] },
         { key: 'heap', title: 'Heap (bytes)', legend: [['Free','legend-accent'],['Min Ever','legend-red']] },
         { key: 'queuedepth', title: 'Queue Depth', legend: [['SD','legend-accent'],['Command','legend-cyan']] },
     ];
