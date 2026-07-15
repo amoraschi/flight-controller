@@ -12,7 +12,7 @@
 #define EXTERNAL_COMMANDS           1
 #define AUTO_START_CALIBRATION		0
 
-#define BUZZER_SILENT				0
+#define BUZZER_SILENT				1
 
 // Altitude configuration
 #define ALTITUDE_IIR_FILTER_ALPHA    0.1f
