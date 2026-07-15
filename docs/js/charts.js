@@ -222,10 +222,6 @@ function redrawAllCharts() {
             { data: getCol(visible, 'HeapFreeBytes'), color: accent },
             { data: getCol(visible, 'HeapMinFreeBytes'), color: red },
         ]},
-        { key: 'queuedepth', datasets: [
-            { data: getCol(visible, 'SDQueueDepth'), color: accent },
-            { data: getCol(visible, 'CommandQueueDepth'), color: cyan },
-        ]},
         { key: 'sddropped', datasets: [
             { data: getCol(visible, 'SDDroppedCount'), color: red },
         ]},
@@ -236,11 +232,6 @@ function redrawAllCharts() {
             { data: getCol(visible, 'BMP581ErrorCount'), color: red },
             { data: getCol(visible, 'IIM42653ErrorCount'), color: green },
             { data: getCol(visible, 'IIS2MDCTRErrorCount'), color: blue },
-        ]},
-        { key: 'sensorfreshness', datasets: [
-            { data: getCol(visible, 'BMP581StaleTicks'), color: red },
-            { data: getCol(visible, 'IIM42653StaleTicks'), color: green },
-            { data: getCol(visible, 'IIS2MDCTRStaleTicks'), color: blue },
         ]},
     ];
 
@@ -272,11 +263,9 @@ function renderCharts() {
         { key: 'sdwrite', title: 'SD Write Duration (ms)' },
         { key: 'stackusage', title: 'Stack Usage (%)', legend: [['StateMachine','legend-x'],['SDProducer','legend-y'],['SDWriter','legend-z'],['Telemetry','legend-yellow']] },
         { key: 'heap', title: 'Heap (bytes)', legend: [['Free','legend-accent'],['Min Ever','legend-red']] },
-        { key: 'queuedepth', title: 'Queue Depth', legend: [['SD','legend-accent'],['Command','legend-cyan']] },
         { key: 'sddropped', title: 'SD Dropped Records' },
         { key: 'lastcommand', title: 'Last Command Type' },
         { key: 'sensorerrors', title: 'Sensor Error Count', legend: [['BMP581','legend-x'],['IIM42653','legend-y'],['IIS2MDCTR','legend-z']] },
-        { key: 'sensorfreshness', title: 'Sensor Staleness (ticks)', legend: [['BMP581','legend-x'],['IIM42653','legend-y'],['IIS2MDCTR','legend-z']] },
     ];
 
     if (allRecords[0] && allRecords[0].State !== undefined) {
