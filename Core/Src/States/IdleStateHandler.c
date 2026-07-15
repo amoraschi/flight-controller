@@ -1,10 +1,9 @@
 #include "States/StateHandlers.h"
+#include "Utils/Calibrations.h"
 #include "stm32h7xx_hal.h"
 
 void IdleStateEntry(SystemContext_t *ctx) {
-    // TODO: Refine
-    ctx->ReferencePressurePa = 0.0f;
-    ctx->ReferencePressurePaValid = 0;
+    ResetCalibrationContext(ctx);
 }
 
 SystemState_t IdleStateHandler(SystemContext_t *Context, FlightData_t FlightData) {

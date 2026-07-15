@@ -57,6 +57,14 @@ void Error_Handler(void);
 /* USER CODE END EFP */
 
 /* Private defines -----------------------------------------------------------*/
+#define DROGUE_SR_3V3_Pin GPIO_PIN_3
+#define DROGUE_SR_3V3_GPIO_Port GPIOE
+#define DROGUE_RS_3V3_Pin GPIO_PIN_4
+#define DROGUE_RS_3V3_GPIO_Port GPIOE
+#define PCHUTE_SR_3V3_Pin GPIO_PIN_10
+#define PCHUTE_SR_3V3_GPIO_Port GPIOA
+#define PCHUTE_RS_3V3_Pin GPIO_PIN_11
+#define PCHUTE_RS_3V3_GPIO_Port GPIOA
 
 /* USER CODE BEGIN Private defines */
 

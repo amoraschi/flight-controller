@@ -31,8 +31,9 @@ FRESULT MountAndOpen(void) {
     // TODO: Revise, comment out if necessary
     // Card identification done at 390 kHz (ClockDiv=162).
     // Switch to 8 MHz for data transfers: 64 MHz / (6+2) = 8 MHz
-    // hsd1.Init.ClockDiv = 6;
-    // SDMMC_Init(hsd1.Instance, hsd1.Init);
+    // Improvement from around 1.4s to around 140ms
+    hsd1.Init.ClockDiv = 6;
+    SDMMC_Init(hsd1.Instance, hsd1.Init);
 
     char LogName[13];
     Result = NextLogName(LogName, sizeof(LogName));
