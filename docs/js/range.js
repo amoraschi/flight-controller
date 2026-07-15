@@ -35,8 +35,14 @@ function initRangeControl() {
     hl.addEventListener('mousedown', (e) => {
         e.preventDefault(); dragging = 'left'; hl.classList.add('active');
     });
+    hl.addEventListener('dblclick', (e) => {
+        e.preventDefault(); viewStart = 0; updateRangeUI(); redrawAllCharts();
+    });
     hr.addEventListener('mousedown', (e) => {
         e.preventDefault(); dragging = 'right'; hr.classList.add('active');
+    });
+    hr.addEventListener('dblclick', (e) => {
+        e.preventDefault(); viewEnd = 1; updateRangeUI(); redrawAllCharts();
     });
     sel.addEventListener('mousedown', (e) => {
         e.preventDefault(); dragging = 'middle';
