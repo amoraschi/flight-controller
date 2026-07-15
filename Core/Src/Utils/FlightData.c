@@ -52,10 +52,6 @@ FlightData_t GetFlightData(SystemState_t SystemState, SystemContext_t *SystemCon
 	FlightData.VelY = 0;
 	FlightData.VelZ = 0;
 
-	FlightData.VelX = 0;
-	FlightData.VelY = 0;
-	FlightData.VelZ = 0;
-
 	FlightData.Flags = SystemFaultFlags;
 	FlightData.BatteryVoltage = 0; // BatteryGetVoltage();
 	FlightData.LoopExecutionUs = DiagnosticsGetLoopUs();
