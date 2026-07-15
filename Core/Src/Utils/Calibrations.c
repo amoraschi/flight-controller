@@ -1,12 +1,22 @@
-#include "Utils/IMU.h"
-#include "Utils/configuration.h"
+#include "Utils/Calibrations.h"
 
-float CalculateGyroscope(uint8_t MSB, uint8_t LSB, float Factor) {
-    return ((int16_t)((MSB << 8) | LSB)) * Factor;
-}
+void CalibratePressure(FlightData_t FlightData, SystemContext_t *SystemContext, float *PressureSumPa, uint16_t *PressureSampleCount, uint16_t *PressureDiscardCount) {
+    float PressurePa = FlightData.PressurePa;
 
-float CalculateAcceleration(uint8_t MSB, uint8_t LSB, float Factor) {
-    return ((int16_t)((MSB << 8) | LSB)) * Factor;
+    if (PressurePa > 0.0f && !SystemContext->ReferencePressurePaValid) {
+        if ((*PressureDiscardCount) < PRESSURE_CALIBRATION_DISCARD_SAMPLES) {
+            (*PressureDiscardCount)++;
+            return;
+        }
+
+        (*PressureSumPa) += PressurePa;
+        (*PressureSampleCount)++;
+
+        if ((*PressureSampleCount) >= PRESSURE_CALIBRATION_SAMPLES) {
+            SystemContext->ReferencePressurePa = (*PressureSumPa) / (float)(*PressureSampleCount);
+            SystemContext->ReferencePressurePaValid = true;
+        }
+    }
 }
 
 void CalibrateGyroscope(FlightData_t FlightData, SystemContext_t *SystemContext, float *GyroSumX, float *GyroSumY, float *GyroSumZ, uint16_t *GyroSampleCount, uint16_t *GyroDiscardCount) {
@@ -31,8 +41,4 @@ void CalibrateGyroscope(FlightData_t FlightData, SystemContext_t *SystemContext,
         SystemContext->GyroBiasZ = (*GyroSumZ) * InvCount;
         SystemContext->GyroCalibrationValid = true;
     }
-}
-
-float CalculateBiasedGyroscope(SystemContext_t *SystemContext, float Value, float Bias) {
-    return SystemContext->GyroCalibrationValid ? Value - Bias : Value;
 }

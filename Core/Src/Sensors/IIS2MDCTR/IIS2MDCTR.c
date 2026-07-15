@@ -1,6 +1,5 @@
 #include "Sensors/IIS2MDCTR.h"
-
-#include "Utils/Magnetometer.h"
+#include "Utils/Calculations.h"
 
 HAL_StatusTypeDef IIS2MDCTR_ReadRegister(I2C_HandleTypeDef *IIS2MDCTR_Handle, uint8_t Reg, uint8_t *Data, uint16_t Size) {
     if (IIS2MDCTR_Handle == NULL || Data == NULL) {

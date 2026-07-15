@@ -1,5 +1,5 @@
 #include "Sensors/IIS2MDCTR.h"
-#include "Utils/Magnetometer.h"
+#include "Utils/Calculations.h"
 #include "Sensors/Sensors.h"
 
 static IIS2MDCTR_Mailbox_t IIS2MDCTR_Mailbox = {0};

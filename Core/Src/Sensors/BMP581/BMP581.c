@@ -1,5 +1,5 @@
 #include "Sensors/BMP581.h"
-#include "Utils/Barometer.h"
+#include "Utils/Calculations.h"
 #include "Utils/shared.h"
 
 static HAL_StatusTypeDef BMP581_ReadRegister(I2C_HandleTypeDef *BMP581_Handle, uint8_t Reg, uint8_t *Data, uint16_t Size) {

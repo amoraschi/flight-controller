@@ -1,8 +1,7 @@
 #include "Utils/shared.h"
 #include "Sensors/Sensors.h"
-#include "Utils/IMU.h"
-#include "Utils/Altitude.h"
 #include "Utils/Battery.h"
+#include "Utils/Calculations.h"
 
 FlightData_t GetFlightData(SystemState_t SystemState, SystemContext_t *SystemContext, IIM42653_SensorData_t IIM42653_FlightData, BMP581_SensorData_t BMP581_FlightData, IIS2MDCTR_SensorData_t IIS2MDCTR_FlightData) {
 	FlightData_t FlightData;

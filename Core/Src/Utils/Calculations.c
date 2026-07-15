@@ -1,4 +1,5 @@
-#include "Utils/Altitude.h"
+#include "Utils/shared.h"
+#include "Utils/Calculations.h"
 
 float CalculateKelvinFromCelsius(float TemperatureC) {
     return TemperatureC + 273.15f;
@@ -31,4 +32,28 @@ float CalculateFilteredAltitude(SystemContext_t *SystemContext, float RawAltitud
 
     FilteredAltitude = FilteredAltitude + ALTITUDE_IIR_FILTER_ALPHA * (RawAltitude - FilteredAltitude);
     return FilteredAltitude;
+}
+
+float CalculatePressureTemperature(uint8_t MSB, uint8_t LSB, uint8_t XLSB, bool Temperature) {
+    int32_t RawValue = (int32_t)((MSB << 16) | (LSB << 8) | XLSB);
+    int32_t SignValue = (RawValue << 8) >> 8;
+
+    return (float)SignValue * (Temperature ? TEMPERATURE_SCALE : PRESSURE_SCALE);
+}
+
+float CalculateGyroscope(uint8_t MSB, uint8_t LSB, float Factor) {
+    return ((int16_t)((MSB << 8) | LSB)) * Factor;
+}
+
+float CalculateAcceleration(uint8_t MSB, uint8_t LSB, float Factor) {
+    return ((int16_t)((MSB << 8) | LSB)) * Factor;
+}
+
+float CalculateBiasedGyroscope(SystemContext_t *SystemContext, float Value, float Bias) {
+    return SystemContext->GyroCalibrationValid ? Value - Bias : Value;
+}
+
+float CalculateMagneticField(uint8_t MSB, uint8_t LSB) {
+    int16_t Raw = (int16_t)((MSB << 8) | LSB);
+    return (float)Raw * 1.5f;
 }

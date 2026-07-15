@@ -1,7 +1,7 @@
 #include <stdbool.h>
 #include "Sensors/IIM42653.h"
 #include "FreeRTOS.h"
-#include "Utils/IMU.h"
+#include "Utils/Calculations.h"
 
 void IIM42653_SelectCS(void) {
     HAL_GPIO_WritePin(IIM42653_CS_GPIO_PORT, IIM42653_CS_GPIO_PIN, GPIO_PIN_RESET);

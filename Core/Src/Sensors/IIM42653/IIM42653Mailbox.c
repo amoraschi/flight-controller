@@ -1,5 +1,5 @@
 #include "Sensors/IIM42653.h"
-#include "Utils/IMU.h"
+#include "Utils/Calculations.h"
 #include "Sensors/Sensors.h"
 
 static IIM42653_Mailbox_t IIM42653_Mailbox = {0};
