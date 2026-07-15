@@ -1,10 +1,11 @@
 #include <stdlib.h>
 #include "States/StateHandlers.h"
+#include "Utils/Pyro.h"
 
 #include "stm32h7xx_hal.h"
 
 void ParachuteStateEntry(SystemContext_t *ctx) {
-    // TODO: Refine
+    PyroFire(PYRO_CHANNEL_PARACHUTE);
 }
 
 SystemState_t ParachuteStateHandler(SystemContext_t *Context, FlightData_t FlightData) {
