@@ -190,10 +190,10 @@ int main(void)
   SDLoggingQueue = xQueueCreate(QUEUE_LENGTH, sizeof(FlightData_t));
   CommandQueue = xQueueCreate(QUEUE_LENGTH, sizeof(CommandType_t));
 
-  CreateTelemetryTask(&huart1, tskIDLE_PRIORITY + 4, 256);
-  CreateSensorConfigTask(&SystemContext, tskIDLE_PRIORITY + 3, 256);
-  CreateStateMachineTask(&SystemContext, tskIDLE_PRIORITY + 6, 256);
-  CreateSDLoggingTask(&SystemContext, tskIDLE_PRIORITY + 1, 1024);
+  CreateTelemetryTask(&huart1, tskIDLE_PRIORITY + 4, STACK_SIZE_TELEMETRY);
+  CreateSensorConfigTask(&SystemContext, tskIDLE_PRIORITY + 3, STACK_SIZE_SENSOR_CONFIG);
+  CreateStateMachineTask(&SystemContext, tskIDLE_PRIORITY + 6, STACK_SIZE_STATE_MACHINE);
+  CreateSDLoggingTask(&SystemContext, tskIDLE_PRIORITY + 1, STACK_SIZE_SD_LOGGING);
 
   // TODO: Revise rate
   TimerIIM42653 = xTimerCreate("IIM42653", pdMS_TO_TICKS(10), pdTRUE, NULL, IIM42653_Timer_Callback);

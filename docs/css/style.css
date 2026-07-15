@@ -180,6 +180,8 @@ body {
 .legend-z::before { background: var(--blue) !important; }
 .legend-accent::before { background: var(--accent) !important; }
 .legend-red::before { background: var(--red) !important; }
+.legend-yellow::before { background: var(--yellow) !important; }
+.legend-cyan::before { background: var(--cyan) !important; }
 .chart-container canvas { width: 100%; height: 180px; display: block; }
 
 input[type="file"] { display: none; }
