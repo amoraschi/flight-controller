@@ -6,7 +6,7 @@
 #include "Utils/shared.h"
 #include "task.h"
 
-extern TaskHandle_t SDLoggingTaskHandle;
+extern TaskHandle_t SDProducerTaskHandle;
 extern TaskHandle_t SDWriterTaskHandle;
 
 void CreateSDLoggingTask(SystemContext_t *SystemContext, UBaseType_t Priority, uint16_t StackSize);
