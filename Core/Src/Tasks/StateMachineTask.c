@@ -4,6 +4,7 @@
 #include <Tasks/StateMachineTask.h>
 #include <Utils/FlightData.h>
 #include <Utils/Battery.h>
+#include <Utils/Diagnostics.h>
 #include "Managers/Managers.h"
 #include "queue.h"
 
@@ -38,7 +39,8 @@ void StateMachineTask(void *pvParameters) {
     Buzzer_Beep_Counter(100, 2, 500, false);
 
     for (;;) {
-        // TODO: Revise timeout
+        uint32_t LoopStart = DiagnosticsGetCycles();
+
         BMP581_SensorData_t BMP581_SensorData;
         IIM42653_SensorData_t IIM42653_SensorData;
         IIS2MDCTR_SensorData_t IIS2MDCTR_SensorData;
@@ -68,10 +70,14 @@ void StateMachineTask(void *pvParameters) {
         }
 
         if (SDLoggingQueue != NULL && !StateChanged) {
-			xQueueSend(SDLoggingQueue, &FlightData, 0);
+			if (xQueueSend(SDLoggingQueue, &FlightData, 0) != pdPASS) {
+				DiagnosticsSDDropped();
+			}
 		}
 
         SerialSendFlightData(&FlightData);
+
+        DiagnosticsUpdateLoop(LoopStart);
 
         dbg_current_state = CurrentSystemState;
         dbg_system_faults = SystemFaultFlags;

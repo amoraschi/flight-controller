@@ -1,5 +1,6 @@
 #include <Tasks/SDLoggingTask.h>
 #include "Utils/SD.h"
+#include "Utils/Diagnostics.h"
 
 TaskHandle_t SDProducerTaskHandle;
 TaskHandle_t SDWriterTaskHandle;
@@ -63,9 +64,11 @@ void SDWriterTask(void *pvParameters) {
     for (;;) {
         xSemaphoreTake(WriteSemaphore, portMAX_DELAY);
 
+        DiagnosticsSDWriteStart();
         if (WriteLoggingBuffer(WriteBuffer) != FR_OK) {
             dbg_write_fault++;
         }
+        DiagnosticsSDWriteEnd();
 
         WriteBuffer->Count = 0;
         f_sync(&SDFile);

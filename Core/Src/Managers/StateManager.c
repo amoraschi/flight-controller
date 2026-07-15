@@ -1,6 +1,7 @@
 #include "States/StateHandlers.h"
 #include "Sensors/Sensors.h"
 #include "Utils/shared.h"
+#include "Utils/Diagnostics.h"
 #include "timers.h"
 #include "Protocol/Protocol.h"
 #include <Tasks/SensorConfigTask.h>
@@ -92,6 +93,8 @@ SystemState_t HandleCommand(SystemState_t CurrentSystemState, CommandType_t Comm
     if (Received != pdPASS) {
         return CurrentSystemState;
     }
+
+    DiagnosticsCommandReceived((uint8_t)CommantType);
 
     switch (CommantType) {
         case COMMAND_RESET:

@@ -36,6 +36,7 @@
 
 #include <timers.h>
 #include "Utils/Battery.h"
+#include "Utils/Diagnostics.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -158,7 +159,7 @@ int main(void)
   MX_FATFS_Init();
   MX_USART1_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  DiagnosticsInitDWT();
   /* USER CODE END 2 */
 
   /* Init scheduler */
