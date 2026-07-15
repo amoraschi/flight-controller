@@ -31,6 +31,12 @@
 #define GYRO_CALIBRATION_DISCARD_SAMPLES        3000
 #define GYRO_CALIBRATION_SAMPLES                1000
 
+// Stack Sizes (words)
+#define STACK_SIZE_TELEMETRY            256
+#define STACK_SIZE_SENSOR_CONFIG        256
+#define STACK_SIZE_STATE_MACHINE        512
+#define STACK_SIZE_SD_LOGGING           1024
+
 // SD Configuration
 #define SD_LOGGING_RECORDS_PER_BUFFER       1000
 
