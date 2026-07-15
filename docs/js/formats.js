@@ -24,6 +24,10 @@ const FIELD_DEFS = [
     { name: 'BatteryVoltage',   type: 'float32' },
     { name: 'LoopExecutionUs',  type: 'uint32' },
     { name: 'LoopMaxExecutionUs', type: 'uint32' },
+    { name: 'BMP581ReadUs',     type: 'uint32' },
+    { name: 'IIM42653ReadUs',   type: 'uint32' },
+    { name: 'IIS2MDCTRReadUs',  type: 'uint32' },
+    { name: 'SDWriteUs',        type: 'uint32' },
     { name: 'State',            type: 'uint8' },
     { name: 'SyncEnd',          type: 'uint8' },
 ];

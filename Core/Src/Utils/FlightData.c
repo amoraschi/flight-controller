@@ -30,6 +30,10 @@ FlightData_t GetFlightData(SystemState_t SystemState, SystemContext_t *SystemCon
 	FlightData.Altitude = CalculateAltitude(SystemContext, FlightData.PressurePa, FlightData.TemperatureC);
 	FlightData.Altitude = CalculateFilteredAltitude(SystemContext, FlightData.Altitude);
 
+	FlightData.VelX = 0;
+	FlightData.VelY = 0;
+	FlightData.VelZ = 0;
+
 	FlightData.Flags = SystemFaultFlags;
 //	FlightData.BatteryVoltage = BatteryGetVoltage();
 	FlightData.State = SystemState;

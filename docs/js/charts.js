@@ -198,8 +198,16 @@ function redrawAllCharts() {
         ]},
         { key: 'voltage', datasets: [{ data: getCol(visible, 'BatteryVoltage'), color: yellow }] },
         { key: 'looptime', datasets: [
-            { data: getCol(visible, 'LoopExecutionUs'), color: accent },
-            { data: getCol(visible, 'LoopMaxExecutionUs'), color: red },
+            { data: getCol(visible, 'LoopExecutionUs').map(v => v / 1000), color: accent },
+            { data: getCol(visible, 'LoopMaxExecutionUs').map(v => v / 1000), color: red },
+        ]},
+        { key: 'sensorlatency', datasets: [
+            { data: getCol(visible, 'BMP581ReadUs').map(v => v / 1000), color: red },
+            { data: getCol(visible, 'IIM42653ReadUs').map(v => v / 1000), color: green },
+            { data: getCol(visible, 'IIS2MDCTRReadUs').map(v => v / 1000), color: blue },
+        ]},
+        { key: 'sdwrite', datasets: [
+            { data: getCol(visible, 'SDWriteUs').map(v => v / 1000), color: accent },
         ]},
     ];
 
@@ -224,9 +232,11 @@ function renderCharts() {
         { key: 'pressure', title: 'Pressure' },
         { key: 'temp', title: 'Temperature' },
         { key: 'alt', title: 'Altitude' },
-        { key: 'vel', title: 'Velocity Z' },
+        { key: 'vel', title: 'Velocity', legend: [['X','legend-x'],['Y','legend-y'],['Z','legend-z']] },
         { key: 'voltage', title: 'Battery Voltage' },
-        { key: 'looptime', title: 'Loop Time (µs)', legend: [['Current','legend-accent'],['Max','legend-red']] },
+        { key: 'looptime', title: 'Loop Time (ms)', legend: [['Current','legend-accent'],['Max','legend-red']] },
+        { key: 'sensorlatency', title: 'Sensor Read Latency (ms)', legend: [['BMP581','legend-x'],['IIM42653','legend-y'],['IIS2MDCTR','legend-z']] },
+        { key: 'sdwrite', title: 'SD Write Duration (ms)' },
     ];
 
     if (allRecords[0] && allRecords[0].State !== undefined) {
@@ -251,6 +261,7 @@ function renderCharts() {
         container.innerHTML = `<div class="chart-title">${def.title}${legendHTML}</div>`;
         const canvas = document.createElement('canvas');
         canvas.dataset.key = def.key;
+        if (def.key === 'sensorlatency') canvas._legendLabels = false;
         container.appendChild(canvas);
 
         const tooltip = document.createElement('div');
@@ -290,7 +301,7 @@ function renderCharts() {
                 const rec = allRecords[startIdx + idx];
                 const tickStr = rec && rec.Tick !== undefined ? ' · ' + ((rec.Tick - allRecords[0].Tick) / 1000).toFixed(2) + 's' : '';
                 rows = '<div class="tt-sample">#' + (startIdx + idx) + tickStr + '</div>';
-                const labels = meta.datasets.length === 3 ? ['X', 'Y', 'Z'] : null;
+                const labels = canvas._legendLabels === false ? null : (meta.datasets.length === 3 ? ['X', 'Y', 'Z'] : null);
                 for (let d = 0; d < meta.datasets.length; d++) {
                     const ds = meta.datasets[d];
                     const val = ds.data[idx];
