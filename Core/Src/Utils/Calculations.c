@@ -57,3 +57,21 @@ float CalculateMagneticField(uint8_t MSB, uint8_t LSB) {
     int16_t Raw = (int16_t)((MSB << 8) | LSB);
     return (float)Raw * 1.5f;
 }
+
+float CalculateVerticalVelocity(float Altitude, uint32_t Tick) {
+    static float PreviousAltitude;
+    static uint32_t PreviousTick;
+
+    uint32_t DeltaTick = Tick - PreviousTick;
+    float Velocity = 0.0f;
+
+    if (DeltaTick > 0 && PreviousTick > 0) {
+        float DeltaSeconds = (float)DeltaTick / 1000.0f;
+        Velocity = (Altitude - PreviousAltitude) / DeltaSeconds;
+    }
+
+    PreviousAltitude = Altitude;
+    PreviousTick = Tick;
+
+    return Velocity;
+}

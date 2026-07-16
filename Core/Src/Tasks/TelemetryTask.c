@@ -2,6 +2,7 @@
 #include <stdint.h>
 #include <Tasks/TelemetryTask.h>
 #include "Protocol/Protocol.h"
+#include "HIL/HIL.h"
 
 __attribute__((section(".dma_buffer")))
 uint8_t TELEMETRY_RX_BUFFER[TELEMETRY_RX_BUFFER_SIZE];
@@ -35,6 +36,11 @@ void TelemetryTask(void *pvParameters) {
             uint8_t RawCommand = 0;
             if (ProtocolFeed(&Parser, TELEMETRY_RX_BUFFER[i], &RawCommand)) {
                 CommandType_t Command = (CommandType_t)RawCommand;
+#if HIL_MODE
+                if (Command == COMMAND_HIL_DATA) {
+                    HandleHILPacket(Parser.Payload);
+                }
+#endif
                 if (Command >= COMMAND_RESET && Command <= COMMAND_CALIBRATION) {
                     xQueueSend(CommandQueue, &Command, 0);
                 }

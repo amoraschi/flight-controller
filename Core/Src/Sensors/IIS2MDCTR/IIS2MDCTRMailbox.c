@@ -15,6 +15,12 @@ void IIS2MDCTR_Mailbox_Publish(const uint8_t *RXBuffer) {
     IIS2MDCTR_Mailbox.WriteIndex = 1 - wi;
 }
 
+void IIS2MDCTR_Mailbox_Inject(const IIS2MDCTR_SensorData_t *Data) {
+    uint8_t wi = IIS2MDCTR_Mailbox.WriteIndex;
+    IIS2MDCTR_Mailbox.Slot[wi] = *Data;
+    IIS2MDCTR_Mailbox.WriteIndex = 1 - wi;
+}
+
 void IIS2MDCTR_Mailbox_Read(IIS2MDCTR_SensorData_t *Out) {
     uint8_t ri = 1 - IIS2MDCTR_Mailbox.WriteIndex;
     dbg_slot = ri;

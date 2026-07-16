@@ -55,6 +55,10 @@ void OnStateEntry(const SystemState_t CurrentSystemState, SystemContext_t *Syste
 }
 
 void HandleSensors(SystemContext_t *SystemContext, SystemState_t CurrentSystemState) {
+#if HIL_MODE
+	(void)SystemContext;
+	(void)CurrentSystemState;
+#else
 	switch (CurrentSystemState) {
 		case STATE_IDLE:
 			if (BMP581_Mode_Idle(BMP581_HANDLE) != HAL_OK) {
@@ -87,6 +91,7 @@ void HandleSensors(SystemContext_t *SystemContext, SystemState_t CurrentSystemSt
 		default:
 			break;
 	}
+#endif
 }
 
 SystemState_t HandleCommand(SystemState_t CurrentSystemState, CommandType_t CommantType, BaseType_t Received) {

@@ -197,6 +197,10 @@ function redrawAllCharts() {
             { data: getCol(visible, 'VelZ'), color: blue },
         ]},
         { key: 'voltage', datasets: [{ data: getCol(visible, 'BatteryVoltage'), color: yellow }] },
+        { key: 'relay', datasets: [
+            { data: visible.map(r => (r.RelayState & 0x01) ? 1 : 0), color: red },
+            { data: visible.map(r => (r.RelayState & 0x02) ? 1 : 0), color: blue },
+        ]},
     ];
 
     for (const def of chartDefs) {
@@ -222,6 +226,7 @@ function renderCharts() {
         { key: 'alt', title: 'Altitude' },
         { key: 'vel', title: 'Velocity Z' },
         { key: 'voltage', title: 'Battery Voltage' },
+        { key: 'relay', title: 'Relay State', legend: [['Drogue','legend-x'],['Parachute','legend-z']] },
     ];
 
     if (allRecords[0] && allRecords[0].State !== undefined) {

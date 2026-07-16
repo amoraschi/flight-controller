@@ -5,12 +5,13 @@
 #include <stdbool.h>
 #include "Utils/configuration.h"
 
-#define PROTOCOL_MAX_PAYLOAD    8
+#define PROTOCOL_MAX_PAYLOAD    48
 
 typedef enum {
     COMMAND_RESET = 0x01,
     COMMAND_ABORT = 0x02,
-    COMMAND_CALIBRATION = 0x03
+    COMMAND_CALIBRATION = 0x03,
+    COMMAND_HIL_DATA = 0x10
 } CommandType_t;
 
 typedef enum {

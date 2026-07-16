@@ -1,13 +1,18 @@
 #include "States/StateHandlers.h"
 #include "stm32h7xx_hal.h"
 
+static bool VelocityReached;
+
 void BurnStateEntry(SystemContext_t *ctx) {
-    // TODO: Refine
+    VelocityReached = false;
 }
 
 SystemState_t BurnStateHandler(SystemContext_t *Context, FlightData_t FlightData) {
-	// TODO: Revise, hysteresis, use acceleration if possible
-	if (FlightData.VelY < BURN_APOGEE_VEL_Y_THRESHOLD) {
+	if (FlightData.VelY > BURN_MIN_VEL_Y_REACHED) {
+		VelocityReached = true;
+	}
+
+	if (VelocityReached && FlightData.VelY < BURN_APOGEE_VEL_Y_THRESHOLD) {
 		return STATE_PASSIVE_BURNOUT;
 	}
 

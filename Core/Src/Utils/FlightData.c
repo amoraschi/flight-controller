@@ -2,6 +2,7 @@
 #include "Sensors/Sensors.h"
 #include "Utils/Battery.h"
 #include "Utils/Calculations.h"
+#include "Utils/Pyro.h"
 
 FlightData_t GetFlightData(SystemState_t SystemState, SystemContext_t *SystemContext, IIM42653_SensorData_t IIM42653_FlightData, BMP581_SensorData_t BMP581_FlightData, IIS2MDCTR_SensorData_t IIS2MDCTR_FlightData) {
 	FlightData_t FlightData;
@@ -31,12 +32,13 @@ FlightData_t GetFlightData(SystemState_t SystemState, SystemContext_t *SystemCon
 	FlightData.Altitude = CalculateFilteredAltitude(SystemContext, FlightData.Altitude);
 
 	FlightData.VelX = 0;
-	FlightData.VelY = 0;
+	FlightData.VelY = CalculateVerticalVelocity(FlightData.Altitude, FlightData.Tick);
 	FlightData.VelZ = 0;
 
 	FlightData.Flags = SystemFaultFlags;
 	FlightData.BatteryVoltage = 0; // BatteryGetVoltage();
 	FlightData.State = SystemState;
+	FlightData.RelayState = PyroGetState();
 	FlightData.SyncEnd = PACKET_FOOTER;
 
 	return FlightData;

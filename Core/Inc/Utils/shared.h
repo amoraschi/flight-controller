@@ -89,6 +89,7 @@ typedef struct {
     uint32_t Flags;
     float BatteryVoltage;
     uint8_t State;
+    uint8_t RelayState;
     uint8_t SyncEnd;
 } FlightData_t;
 #pragma pack(pop)

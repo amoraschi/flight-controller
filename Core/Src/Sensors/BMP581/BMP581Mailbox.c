@@ -12,6 +12,12 @@ void BMP581_Mailbox_Publish(const uint8_t *RXBuffer) {
     BMP581_Mailbox.WriteIndex = 1 - wi;
 }
 
+void BMP581_Mailbox_Inject(const BMP581_SensorData_t *Data) {
+    uint8_t wi = BMP581_Mailbox.WriteIndex;
+    BMP581_Mailbox.Slot[wi] = *Data;
+    BMP581_Mailbox.WriteIndex = 1 - wi;
+}
+
 void BMP581_Mailbox_Read(BMP581_SensorData_t *Out) {
     uint8_t ri = 1 - BMP581_Mailbox.WriteIndex;
     *Out = BMP581_Mailbox.Slot[ri];

@@ -16,6 +16,12 @@ void IIM42653_Mailbox_Publish(const uint8_t *RXBuffer) {
     IIM42653_Mailbox.WriteIndex = 1 - wi;
 }
 
+void IIM42653_Mailbox_Inject(const IIM42653_SensorData_t *Data) {
+    uint8_t wi = IIM42653_Mailbox.WriteIndex;
+    IIM42653_Mailbox.Slot[wi] = *Data;
+    IIM42653_Mailbox.WriteIndex = 1 - wi;
+}
+
 void IIM42653_Mailbox_Read(IIM42653_SensorData_t *Out) {
     uint8_t ri = 1 - IIM42653_Mailbox.WriteIndex;
     *Out = IIM42653_Mailbox.Slot[ri];

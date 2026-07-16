@@ -25,10 +25,13 @@ void Buzzer_Beep(uint32_t Duration);
 void Buzzer_Beep_Counter(uint32_t BeepDuration, uint32_t BeepCount, uint32_t WaitDuration, bool UseHAL);
 
 void BMP581_Mailbox_Publish(const uint8_t *RXBuffer);
+void BMP581_Mailbox_Inject(const BMP581_SensorData_t *Data);
 void BMP581_Mailbox_Read(BMP581_SensorData_t *Out);
 void IIM42653_Mailbox_Publish(const uint8_t *RXBuffer);
+void IIM42653_Mailbox_Inject(const IIM42653_SensorData_t *Data);
 void IIM42653_Mailbox_Read(IIM42653_SensorData_t *Out);
 void IIS2MDCTR_Mailbox_Publish(const uint8_t *RXBuffer);
+void IIS2MDCTR_Mailbox_Inject(const IIS2MDCTR_SensorData_t *Data);
 void IIS2MDCTR_Mailbox_Read(IIS2MDCTR_SensorData_t *Out);
 
 HAL_StatusTypeDef BMP581_Mode_Idle(I2C_HandleTypeDef *BMP581_Handle);
