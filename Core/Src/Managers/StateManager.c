@@ -49,6 +49,11 @@ void OnStateEntry(const SystemState_t CurrentSystemState, SystemContext_t *Syste
         case STATE_LANDED:
             LandedStateEntry(SystemContext);
             break;
+        case STATE_GROUND_ABORT:
+        case STATE_ASCENT_ABORT:
+        case STATE_DESCENT_ABORT:
+            PyroSafeAll();
+            break;
         default:
             break;
     }

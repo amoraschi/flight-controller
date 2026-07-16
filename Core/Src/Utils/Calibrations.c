@@ -1,4 +1,5 @@
 #include "Utils/Calibrations.h"
+#include "Utils/Calculations.h"
 
 static float PressureSumPa;
 static uint16_t PressureSampleCount;
@@ -16,6 +17,8 @@ void ResetCalibrationContext(SystemContext_t *ctx) {
     ctx->GyroBiasZ = 0.0f;
     ctx->GyroCalibrationValid = false;
     ctx->AltitudeFilterInitialized = false;
+
+    ResetVerticalVelocity();
 
     PressureSumPa = 0.0f;
     PressureSampleCount = 0;

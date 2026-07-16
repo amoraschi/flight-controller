@@ -22,5 +22,6 @@ float CalculatePressureTemperature(uint8_t MSB, uint8_t LSB, uint8_t XLSB, bool 
 float CalculateMagneticField(uint8_t MSB, uint8_t LSB);
 
 float CalculateVerticalVelocity(float Altitude, uint32_t Tick);
+void ResetVerticalVelocity(void);
 
 #endif //CALCULATIONS_H
